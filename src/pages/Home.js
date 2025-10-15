@@ -20,15 +20,28 @@ function Home() {
     axios.get(apiUrl)
       .then(res => {
         const data = res.data;
-        // Normalize response to an array to avoid runtime errors when API
-        // returns a single object or a wrapper object (e.g. { stations: [...] })
+        // Normalize common response shapes to an array so the UI can safely map
+        // over stations. Accept:
+        // - an array (most common)
+        // - { stations: [...] } or { data: [...] }
+        // - a single station object (wrap it)
         if (Array.isArray(data)) {
           setStations(data);
         } else if (data && Array.isArray(data.stations)) {
           setStations(data.stations);
-        } else if (data) {
-          console.warn('Unexpected stations response shape, normalizing to empty array:', data);
-          setStations([]);
+        } else if (data && Array.isArray(data.data)) {
+          setStations(data.data);
+        } else if (data && (data._id || data.stationId)) {
+          // single station object
+          setStations([data]);
+        } else if (data && typeof data === 'object') {
+          // unknown object shape — try to pull any array-valued props
+          const arr = Object.values(data).find(v => Array.isArray(v));
+          if (arr) setStations(arr);
+          else {
+            console.warn('Unexpected stations response shape, normalizing to empty array:', data);
+            setStations([]);
+          }
         } else {
           setStations([]);
         }
@@ -103,7 +116,7 @@ function Home() {
           {stations.length === 0 && !error && (
             <Typography align="center" sx={{ width: '100%' }}>No stations available.</Typography>
           )}
-          {(Array.isArray(stations) ? stations.map(station => (
+          {Array.isArray(stations) ? stations.map(station => (
             <Grid item xs={12} sm={6} md={4} key={station._id}>
               <Card sx={{
                 minHeight: 180,
@@ -130,9 +143,7 @@ function Home() {
                 </CardActions>
               </Card>
             </Grid>
-          )) : (
-            <></>
-          ))}
+          )) : null}
         </Grid>
       </Container>
       {/* Footer */}
