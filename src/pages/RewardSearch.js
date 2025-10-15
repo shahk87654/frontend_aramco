@@ -55,12 +55,12 @@ function RewardSearch() {
               </Button>
             </form>
             {error && <Typography color="error" sx={{ mt: 2 }}>{error}</Typography>}
-            {rewards.length > 0 && (
+            {(rewards || []).length > 0 && (
               <Box sx={{ mt: 4 }}>
                 <Typography variant="h6">Visits: {visits}</Typography>
                 <QRCode value={phone + '-' + visits} size={128} style={{ margin: '16px 0' }} />
                 <Grid container spacing={2} sx={{ mt: 2 }}>
-                  {rewards.map(coupon => (
+                  {(rewards || []).map(coupon => (
                     <Grid item xs={12} key={coupon._id}>
                       <Card sx={{ boxShadow: 2, borderRadius: 2 }}>
                         <CardContent>
@@ -88,7 +88,7 @@ function RewardSearch() {
                     </Grid>
                   ))}
                 </Grid>
-                {visits > 0 && visits % 5 === 0 && rewards.some(c => !c.used) && (
+                {visits > 0 && visits % 5 === 0 && (rewards || []).some(c => !c.used) && (
                   <Typography variant="h6" color="success.main" sx={{ mt: 2 }}>
                     Eligible for free tea or coffee! Show your QR code and coupon to claim.
                   </Typography>
