@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import normalizeStations from '../utils/stationUtils';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Grid, Card, CardContent, Container, Divider, Chip, Avatar, Paper, TextField, MenuItem, CircularProgress, IconButton, Button } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -29,7 +30,7 @@ function AdminDashboard() {
     ])
       .then(([statsRes, stationsRes]) => {
         setStats(statsRes.data);
-        setStationOptions(stationsRes.data);
+        setStationOptions(normalizeStations(stationsRes.data));
         setStationLoading(false);
       })
       .catch(() => {
