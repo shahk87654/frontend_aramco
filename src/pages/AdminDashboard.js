@@ -82,7 +82,7 @@ function AdminDashboard() {
                 <Typography variant="h6" color="text.secondary">Avg. Rating</Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 1 }}>
                   <StarIcon sx={{ color: '#ffb300', mr: 0.5 }} />
-                  <Typography variant="h4" sx={{ fontWeight: 700, color: '#1976d2' }}>{stats.avgRating.toFixed(2)}</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 700, color: '#1976d2' }}>{(stats.avgRating ?? 0).toFixed(2)}</Typography>
                 </Box>
               </CardContent>
             </Card>
@@ -94,7 +94,7 @@ function AdminDashboard() {
           </Typography>
           <Divider sx={{ mb: 2 }} />
           <Grid container spacing={2}>
-            {stats.topStations.map(s => (
+            {(stats.topStations || []).map(s => (
               <Grid item xs={12} sm={6} key={s._id}>
                 <Card sx={{ p: 2, borderLeft: '6px solid #1976d2', borderRadius: 2, boxShadow: 2 }}>
                   <CardContent>
@@ -116,7 +116,7 @@ function AdminDashboard() {
           </Typography>
           <Divider sx={{ mb: 2 }} />
           <Grid container spacing={2}>
-            {stats.lowStations.map(s => (
+            {(stats.lowStations || []).map(s => (
               <Grid item xs={12} sm={6} key={s._id}>
                 <Card sx={{ p: 2, borderLeft: '6px solid #d32f2f', borderRadius: 2, boxShadow: 2 }}>
                   <CardContent>
@@ -166,14 +166,14 @@ function AdminDashboard() {
               isOptionEqualToValue={(option, value) => option._id === value._id}
             />
           </Box>
-          {Object.entries(stats.stationReviews)
+          {Object.entries(stats.stationReviews || {})
             .filter(([stationId]) => stationFilter === 'all' || stationId === stationFilter)
-            .map(([stationId, reviews]) => {
+            .map(([stationId, reviews = []]) => {
               const station = stationOptions.find(s => s._id === stationId) || {};
               return (
                 <Box key={stationId} sx={{ mb: 4 }}>
                   <Typography variant="h6" sx={{ color: '#1976d2', mb: 1 }}>{station.name || stationId}</Typography>
-                  {reviews.length === 0 ? (
+                  {(!reviews || reviews.length === 0) ? (
                     <Typography color="text.secondary">No reviews yet.</Typography>
                   ) : (
                     <Box sx={{ overflowX: 'auto' }}>
