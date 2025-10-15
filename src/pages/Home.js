@@ -88,7 +88,27 @@ function Home() {
         )}
         <Grid container spacing={3}>
           {stations.length === 0 && !error && (
-            <Typography align="center" sx={{ width: '100%' }}>No stations available.</Typography>
+            <>
+              <Typography align="center" sx={{ width: '100%' }}>No stations available.</Typography>
+              {process.env.NODE_ENV !== 'production' && (
+                <Box sx={{ width: '100%', textAlign: 'center', mt: 2 }}>
+                  <Button variant="outlined" onClick={async () => {
+                    try {
+                      setLoading(true);
+                      const resp = await axios.post('/api/dev/seed');
+                      setStations(normalizeStations(resp.data.stations || resp.data || []));
+                    } catch (e) {
+                      console.error('Seed error:', e);
+                      setError('Failed to seed demo stations');
+                    } finally {
+                      setLoading(false);
+                    }
+                  }}>
+                    Seed demo stations
+                  </Button>
+                </Box>
+              )}
+            </>
           )}
           {Array.isArray(stations) ? stations.map(station => (
             <Grid item xs={12} sm={6} md={4} key={station._id}>
