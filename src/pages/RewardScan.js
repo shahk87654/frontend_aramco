@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { Box, Card, CardContent, Typography, Button, Container, TextField, Alert, Chip, Divider } from '@mui/material';
+import jsQR from 'jsqr';
 
 function RewardScan() {
   const [code, setCode] = useState('');
@@ -11,6 +12,7 @@ function RewardScan() {
   const [cameraError, setCameraError] = useState('');
   const videoRef = useRef(null);
   const detectorRef = useRef(null);
+  const canvasRef = useRef(null);
   const scanIntervalRef = useRef(null);
 
   const handleSubmit = async (e) => {
@@ -42,7 +44,16 @@ function RewardScan() {
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        await videoRef.current.play();
+        // ensure attributes for autoplay on mobile
+        videoRef.current.autoplay = true;
+        videoRef.current.muted = true;
+        videoRef.current.playsInline = true;
+        try {
+          await videoRef.current.play();
+        } catch (playErr) {
+          // some browsers require user gesture; set a camera error but keep stream
+          console.warn('video play failed', playErr);
+        }
       }
 
       // Use native BarcodeDetector if available for QR/barcode scanning
@@ -55,25 +66,47 @@ function RewardScan() {
         }
       }
 
-      // polling scan loop every 700ms
+      // polling scan loop every 300ms (faster) with BarcodeDetector or jsQR fallback
       scanIntervalRef.current = setInterval(async () => {
         if (!videoRef.current) return;
-        if (detectorRef.current) {
-          try {
+        try {
+          if (detectorRef.current) {
             const barcodes = await detectorRef.current.detect(videoRef.current);
             if (barcodes && barcodes.length > 0) {
               const codeValue = barcodes[0].rawValue;
               if (codeValue) {
                 setCode(codeValue);
-                // stop camera once code captured
                 stopCamera();
               }
             }
-          } catch (err) {
-            // ignore detection errors
+            return;
           }
+
+          // jsQR fallback: draw current frame to canvas and scan
+          const video = videoRef.current;
+          let canvas = canvasRef.current;
+          if (!canvas) {
+            canvas = document.createElement('canvas');
+            canvasRef.current = canvas;
+          }
+          const width = video.videoWidth || video.clientWidth;
+          const height = video.videoHeight || video.clientHeight;
+          if (width === 0 || height === 0) return; // not ready yet
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(video, 0, 0, width, height);
+          const imageData = ctx.getImageData(0, 0, width, height);
+          const codeObj = jsQR(imageData.data, width, height, { inversionAttempts: 'attemptBoth' });
+          if (codeObj && codeObj.data) {
+            setCode(codeObj.data);
+            stopCamera();
+          }
+        } catch (err) {
+          // capture camera errors and show to user
+          console.warn('scan loop error', err);
         }
-      }, 700);
+      }, 300);
 
       setUsingCamera(true);
     } catch (err) {
@@ -91,11 +124,18 @@ function RewardScan() {
         const tracks = videoRef.current.srcObject.getTracks();
         tracks.forEach(t => t.stop());
         videoRef.current.srcObject = null;
+        // remove src attributes to free device on some browsers
+        try { videoRef.current.pause(); } catch (e) {}
+        try { videoRef.current.removeAttribute('src'); } catch (e) {}
       }
     } catch (err) {
       // ignore cleanup errors
     }
     detectorRef.current = null;
+    if (canvasRef.current) {
+      try { canvasRef.current.width = 0; canvasRef.current.height = 0; } catch (e) {}
+      canvasRef.current = null;
+    }
     setUsingCamera(false);
   };
 
@@ -131,7 +171,7 @@ function RewardScan() {
 
               {usingCamera && (
                 <Box sx={{ mt: 2, textAlign: 'center' }}>
-                  <video ref={videoRef} style={{ width: '100%', maxHeight: 360, borderRadius: 8 }} muted playsInline />
+                  <video ref={videoRef} style={{ width: '100%', maxHeight: 360, borderRadius: 8 }} muted playsInline autoPlay />
                   <Typography variant="caption" display="block" sx={{ mt: 1 }}>Point your camera at a QR or barcode. Camera will stop after a successful scan.</Typography>
                 </Box>
               )}
