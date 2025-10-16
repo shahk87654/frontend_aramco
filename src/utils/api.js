@@ -14,4 +14,31 @@ const api = axios.create({
   }
 });
 
+// Attach token from localStorage automatically for convenience
+api.interceptors.request.use(cfg => {
+  const token = localStorage.getItem('token');
+  if (token) cfg.headers = { ...cfg.headers, Authorization: `Bearer ${token}` };
+  return cfg;
+});
+
+// If any admin API responds with 401, clear admin session state and redirect to admin login
+api.interceptors.response.use(
+  res => res,
+  err => {
+    if (err?.response?.status === 401) {
+      try {
+        localStorage.removeItem('token');
+        localStorage.removeItem('isAdmin');
+      } catch (e) {
+        // ignore
+      }
+      // If we are in a browser context, redirect to admin-login (only for admin routes)
+      if (typeof window !== 'undefined' && window.location.pathname.indexOf('/admin') === 0) {
+        window.location.href = '/admin-login';
+      }
+    }
+    return Promise.reject(err);
+  }
+);
+
 export default api;
