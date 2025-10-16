@@ -26,7 +26,8 @@ function AdminCoupons() {
       .catch(() => {});
     axios.get('/api/admin/reviews', { headers: { Authorization: `Bearer ${token}` } })
       .then(res => {
-        const users = res.data.map(r => r.user).filter((u, i, arr) => u && arr.findIndex(x => x?._id === u?._id) === i);
+        const data = res.data;
+        const users = Array.isArray(data) ? data.map(r => r.user).filter((u, i, arr) => u && arr.findIndex(x => x?._id === u?._id) === i) : [];
         setUsers(users);
       })
       .catch(() => {});
@@ -54,10 +55,10 @@ function AdminCoupons() {
         </Typography>
         <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
           <TextField select label="User" value={selectedUser} onChange={e => setSelectedUser(e.target.value)} sx={{ minWidth: 200 }}>
-            {users.map(u => <MenuItem key={u?._id} value={u?._id}>{u?.email || u?.phone}</MenuItem>)}
+            {(Array.isArray(users) ? users : []).map(u => <MenuItem key={u?._id} value={u?._id}>{u?.email || u?.phone}</MenuItem>)}
           </TextField>
           <TextField select label="Station" value={selectedStation} onChange={e => setSelectedStation(e.target.value)} sx={{ minWidth: 200 }}>
-            {stations.map(s => <MenuItem key={s._id} value={s._id}>{s.name}</MenuItem>)}
+            {(Array.isArray(stations) ? stations : []).map(s => <MenuItem key={s._id} value={s._id}>{s.name}</MenuItem>)}
           </TextField>
           <Button variant="contained" color="primary" onClick={handleGenerate}>Generate Coupon</Button>
         </Box>
@@ -73,7 +74,7 @@ function AdminCoupons() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {coupons.map(c => (
+              {(Array.isArray(coupons) ? coupons : []).map(c => (
                 <TableRow key={c._id}>
                   <TableCell>{c.code}</TableCell>
                   <TableCell>{c.user?.email || c.user?.phone || '-'}</TableCell>

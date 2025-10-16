@@ -60,10 +60,10 @@ function RewardSearch() {
             {(rewards || []).length > 0 && (
               <Box sx={{ mt: 4 }}>
                 <Typography variant="h6">Visits: {visits}</Typography>
-                {visitsList && visitsList.length > 0 && (
+                {visitsList && Array.isArray(visitsList) && visitsList.length > 0 && (
                   <Box sx={{ textAlign: 'left', mt: 2 }}>
                     <Typography variant="subtitle1">Recent visits</Typography>
-                    {visitsList.map(v => (
+                    {(Array.isArray(visitsList) ? visitsList : []).map(v => (
                       <Box key={v.id} sx={{ display: 'flex', justifyContent: 'space-between', py: 1, borderBottom: '1px solid #eee' }}>
                         <Typography variant="body2">{v.station || 'Unknown station'}</Typography>
                         <Typography variant="body2">{new Date(v.createdAt).toLocaleString()}</Typography>
