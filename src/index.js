@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
+import ErrorBoundary from './components/ErrorBoundary';
+import DebugBanner from './components/DebugBanner';
 
 // Enforce admin session cooldown on app startup (18 hours)
 try {
@@ -21,6 +23,9 @@ try {
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <BrowserRouter>
-    <App />
+    <ErrorBoundary>
+      <App />
+      <DebugBanner />
+    </ErrorBoundary>
   </BrowserRouter>
 );

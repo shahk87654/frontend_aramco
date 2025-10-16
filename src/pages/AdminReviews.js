@@ -65,7 +65,7 @@ function AdminReviews() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {reviews.map(r => <ReviewRow r={r} key={r._id} />)}
+              {(reviews || []).map(r => <ReviewRow r={r} key={r._id} />)}
             </TableBody>
           </Table>
         </TableContainer>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import normalizeStations from '../utils/stationUtils';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Container, Button, TextField, MenuItem, Snackbar, Alert } from '@mui/material';
 
@@ -21,7 +22,7 @@ function AdminCoupons() {
       .then(res => setCoupons(res.data))
       .catch(() => setError('Failed to load coupons'));
     axios.get('/api/stations', { headers: { Authorization: `Bearer ${token}` } })
-      .then(res => setStations(res.data))
+      .then(res => setStations(normalizeStations(res.data)))
       .catch(() => {});
     axios.get('/api/admin/reviews', { headers: { Authorization: `Bearer ${token}` } })
       .then(res => {

@@ -56,8 +56,8 @@ function MyRewards() {
           <Typography align="center" sx={{ mb: 2, color: '#1976d2' }}>Visits: {visits}</Typography>
         )}
         <Grid container spacing={3}>
-          {coupons.length === 0 && !loading && <Typography align="center" sx={{ width: '100%' }}>No rewards yet.</Typography>}
-          {coupons.map(coupon => (
+          {(coupons.length === 0 || !coupons) && !loading && <Typography align="center" sx={{ width: '100%' }}>No rewards yet.</Typography>}
+          {(coupons || []).map(coupon => (
             <Grid item xs={12} key={coupon._id}>
               <Card sx={{ boxShadow: 4, borderRadius: 3 }}>
                 <CardContent>
@@ -65,7 +65,7 @@ function MyRewards() {
                   {!coupon.used && <CouponQRCode code={coupon.code} />}
                   {coupon.used && <Typography variant="h5" sx={{ my: 1 }}>{coupon.code}</Typography>}
                   <Typography variant="body2" color="text.secondary">Station: {coupon.station?.name || '-'}</Typography>
-                  <Typography variant="body2" color="text.secondary">Date: {new Date(coupon.createdAt).toLocaleString()}</Typography>
+                  <Typography variant="body2" color="text.secondary">Date: {coupon.createdAt ? new Date(coupon.createdAt).toLocaleString() : '-'}</Typography>
                   <Chip label={coupon.used ? 'Used' : 'Unused'} color={coupon.used ? 'success' : 'warning'} sx={{ mt: 1 }} />
                 </CardContent>
               </Card>

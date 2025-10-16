@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import normalizeStations from '../utils/stationUtils';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Grid, Card, CardContent, CardActions, Button, AppBar, Toolbar, Container } from '@mui/material';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
@@ -18,34 +19,7 @@ function Home() {
       : '/api/stations';
       
     axios.get(apiUrl)
-      .then(res => {
-        const data = res.data;
-        // Normalize common response shapes to an array so the UI can safely map
-        // over stations. Accept:
-        // - an array (most common)
-        // - { stations: [...] } or { data: [...] }
-        // - a single station object (wrap it)
-        if (Array.isArray(data)) {
-          setStations(data);
-        } else if (data && Array.isArray(data.stations)) {
-          setStations(data.stations);
-        } else if (data && Array.isArray(data.data)) {
-          setStations(data.data);
-        } else if (data && (data._id || data.stationId)) {
-          // single station object
-          setStations([data]);
-        } else if (data && typeof data === 'object') {
-          // unknown object shape — try to pull any array-valued props
-          const arr = Object.values(data).find(v => Array.isArray(v));
-          if (arr) setStations(arr);
-          else {
-            console.warn('Unexpected stations response shape, normalizing to empty array:', data);
-            setStations([]);
-          }
-        } else {
-          setStations([]);
-        }
-      })
+      .then(res => setStations(normalizeStations(res.data)))
       .catch((err) => {
         console.error('Station fetch error:', err.response?.data || err.message);
         setError(`Failed to fetch stations: ${err.response?.data?.message || err.message}`);
@@ -114,7 +88,27 @@ function Home() {
         )}
         <Grid container spacing={3}>
           {stations.length === 0 && !error && (
-            <Typography align="center" sx={{ width: '100%' }}>No stations available.</Typography>
+            <>
+              <Typography align="center" sx={{ width: '100%' }}>No stations available.</Typography>
+              {process.env.NODE_ENV !== 'production' && (
+                <Box sx={{ width: '100%', textAlign: 'center', mt: 2 }}>
+                  <Button variant="outlined" onClick={async () => {
+                    try {
+                      setLoading(true);
+                      const resp = await axios.post('/api/dev/seed');
+                      setStations(normalizeStations(resp.data.stations || resp.data || []));
+                    } catch (e) {
+                      console.error('Seed error:', e);
+                      setError('Failed to seed demo stations');
+                    } finally {
+                      setLoading(false);
+                    }
+                  }}>
+                    Seed demo stations
+                  </Button>
+                </Box>
+              )}
+            </>
           )}
           {Array.isArray(stations) ? stations.map(station => (
             <Grid item xs={12} sm={6} md={4} key={station._id}>

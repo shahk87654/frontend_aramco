@@ -2,6 +2,7 @@ import React, { useEffect, useReducer } from 'react';
 import QRCode from 'qrcode.react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import normalizeStations from '../utils/stationUtils';
 import StarRating from '../components/StarRating';
 import { Box, Card, CardContent, Typography, TextField, Button, Grid, Alert, Container, Divider, Dialog, DialogTitle, DialogContent, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -39,8 +40,9 @@ function Review() {
   useEffect(() => {
     axios.get(`/api/stations?stationId=${stationId}`)
       .then(res => {
-        const found = res.data.find(s => s.stationId === stationId);
-        setStation(found);
+        const arr = normalizeStations(res.data);
+        const found = arr.find(s => s.stationId === stationId);
+        setStation(found || null);
       })
       .catch(() => dispatch({ type: 'error', value: 'Station not found' }));
   }, [stationId]);
