@@ -7,6 +7,7 @@ function RewardSearch() {
   const [phone, setPhone] = useState('');
   const [rewards, setRewards] = useState([]);
   const [visits, setVisits] = useState(0);
+  const [visitsList, setVisitsList] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [claiming, setClaiming] = useState('');
@@ -20,7 +21,8 @@ function RewardSearch() {
     try {
       const res = await axios.get(`/api/rewards/search?phone=${encodeURIComponent(phone)}`);
       setRewards(res.data.coupons);
-      setVisits(res.data.visits);
+      setVisits(res.data.visits || 0);
+      setVisitsList(res.data.visitsList || []);
       setLoading(false);
     } catch (err) {
       setError('No rewards found or invalid phone number.');
@@ -58,6 +60,17 @@ function RewardSearch() {
             {(rewards || []).length > 0 && (
               <Box sx={{ mt: 4 }}>
                 <Typography variant="h6">Visits: {visits}</Typography>
+                {visitsList && visitsList.length > 0 && (
+                  <Box sx={{ textAlign: 'left', mt: 2 }}>
+                    <Typography variant="subtitle1">Recent visits</Typography>
+                    {visitsList.map(v => (
+                      <Box key={v.id} sx={{ display: 'flex', justifyContent: 'space-between', py: 1, borderBottom: '1px solid #eee' }}>
+                        <Typography variant="body2">{v.station || 'Unknown station'}</Typography>
+                        <Typography variant="body2">{new Date(v.createdAt).toLocaleString()}</Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                )}
                 <QRCode value={phone + '-' + visits} size={128} style={{ margin: '16px 0' }} />
                 <Grid container spacing={2} sx={{ mt: 2 }}>
                   {(rewards || []).map(coupon => (
