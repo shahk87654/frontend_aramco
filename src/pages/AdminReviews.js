@@ -13,8 +13,10 @@ function AdminReviews() {
     const token = localStorage.getItem('token');
     axios.get('/api/admin/reviews', { headers: { Authorization: `Bearer ${token}` } })
       .then(res => {
+        const raw = res.data;
+        const arr = Array.isArray(raw) ? raw : (raw && Array.isArray(raw.reviews) ? raw.reviews : (raw && Array.isArray(raw.data) ? raw.data : []));
         // Sort reviews by station name (A-Z)
-        const sorted = [...res.data].sort((a, b) => {
+        const sorted = [...arr].sort((a, b) => {
           const nameA = (a.station?.name || '').toLowerCase();
           const nameB = (b.station?.name || '').toLowerCase();
           if (nameA < nameB) return -1;
