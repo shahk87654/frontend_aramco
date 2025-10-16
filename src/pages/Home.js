@@ -10,6 +10,7 @@ function Home() {
   const [stations, setStations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [rawStationsResp, setRawStationsResp] = useState(null);
   const navigate = useNavigate();
   const isAdmin = localStorage.getItem('isAdmin') === 'true';
 
@@ -19,7 +20,13 @@ function Home() {
       : '/api/stations';
       
     axios.get(apiUrl)
-      .then(res => setStations(normalizeStations(res.data)))
+      .then(res => {
+        // keep raw response for debugging when stations missing
+        setRawStationsResp(res.data);
+        const norm = normalizeStations(res.data);
+        console.debug('Stations API raw:', res.data, 'normalized ->', norm);
+        setStations(norm);
+      })
       .catch((err) => {
         console.error('Station fetch error:', err.response?.data || err.message);
         setError(`Failed to fetch stations: ${err.response?.data?.message || err.message}`);
@@ -90,6 +97,13 @@ function Home() {
           {stations.length === 0 && !error && (
             <>
               <Typography align="center" sx={{ width: '100%' }}>No stations available.</Typography>
+              {/* Debug output to help identify why stations are missing */}
+              <Box sx={{ width: '100%', mt: 2, px: 2 }}>
+                <Typography variant="caption" color="text.secondary">Raw /api/stations response (for debugging)</Typography>
+                <Box sx={{ mt: 1, maxHeight: 240, overflow: 'auto', bgcolor: '#fff', border: '1px solid #eee', p: 1, borderRadius: 1 }}>
+                  <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', margin: 0 }}>{rawStationsResp ? JSON.stringify(rawStationsResp, null, 2) : 'No response captured'}</pre>
+                </Box>
+              </Box>
               {process.env.NODE_ENV !== 'production' && (
                 <Box sx={{ width: '100%', textAlign: 'center', mt: 2 }}>
                   <Button variant="outlined" onClick={async () => {
