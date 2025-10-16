@@ -40,7 +40,25 @@ function RewardScan() {
   const startCamera = async () => {
     setCameraError('');
     if (usingCamera) return;
+    // quick support check
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setCameraError('Camera not supported in this browser');
+      return;
+    }
     try {
+      // optional permission hint (may not be supported in all browsers)
+      try {
+        if (navigator.permissions && navigator.permissions.query) {
+          const p = await navigator.permissions.query({ name: 'camera' });
+          if (p && p.state === 'denied') {
+            setCameraError('Camera permission denied in browser settings');
+            return;
+          }
+        }
+      } catch (permErr) {
+        // ignore permission query errors
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -53,6 +71,7 @@ function RewardScan() {
         } catch (playErr) {
           // some browsers require user gesture; set a camera error but keep stream
           console.warn('video play failed', playErr);
+          setCameraError('Camera started but video play was prevented by browser (user gesture may be required)');
         }
       }
 
@@ -105,12 +124,15 @@ function RewardScan() {
         } catch (err) {
           // capture camera errors and show to user
           console.warn('scan loop error', err);
+          setCameraError((err && err.message) || String(err));
         }
       }, 300);
 
       setUsingCamera(true);
     } catch (err) {
-      setCameraError('Camera access denied or not available');
+      const msg = (err && (err.name ? `${err.name}: ${err.message}` : err.message)) || String(err);
+      setCameraError(msg || 'Camera access denied or not available');
+      console.warn('getUserMedia error', err);
     }
   };
 
@@ -167,7 +189,15 @@ function RewardScan() {
                 <Button variant="text" onClick={() => { setCode(''); setResult(null); setError(''); }}>Clear</Button>
               </Box>
 
-              {cameraError && <Alert severity="warning" sx={{ mt: 2 }}>{cameraError}</Alert>}
+              {cameraError && (
+                <Box sx={{ mt: 2 }}>
+                  <Alert severity="warning">{cameraError}</Alert>
+                  <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                    <Button variant="outlined" onClick={() => { setCameraError(''); startCamera(); }}>Retry Camera</Button>
+                    <Button variant="text" onClick={() => { setUsingCamera(false); stopCamera(); }}>Stop</Button>
+                  </Box>
+                </Box>
+              )}
 
               {usingCamera && (
                 <Box sx={{ mt: 2, textAlign: 'center' }}>
