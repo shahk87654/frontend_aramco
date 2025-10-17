@@ -69,20 +69,31 @@ api.interceptors.response.use(
         // eslint-disable-next-line no-console
         console.warn(`Detected HTML response from /api; attempting one-time retry against fallback host ${runtimeFallbackHost}`);
         // Perform a single retry to the same path against the fallback host.
-        // If runtimeFallbackHost is an origin only (no trailing /api), allow callers
-        // to set a full origin or an origin + path. Normalize to origin-like string.
+        // If the provided host is an origin without '/api', also try origin + '/api' + path
+        // because many backends mount their API under '/api'. Try both in sequence.
         const host = runtimeFallbackHost.replace(/\/$/, '');
-        // If runtime host already contains '/api', don't duplicate; otherwise append the requested URL.
-        const fallbackUrl = host + (res.config?.url && host.endsWith(res.config?.url) ? '' : (res.config?.url || ''));
-        return axios({
-          method: res.config?.method || 'get',
-          url: fallbackUrl,
-          headers: res.config?.headers || {}
-        }).then(fallbackRes => fallbackRes).catch(() => {
-          // If fallback fails, return the original helpful error to the caller
-          const msg2 = `API returned HTML (likely the frontend index). Check REACT_APP_API_URL, REACT_APP_API_FALLBACK or window.__API_HOST__ configuration. (api.baseURL=${baseURL})`;
-          return Promise.reject({ message: msg2, response: res });
-        });
+        const requestPath = res.config?.url || '';
+        const tryUrls = [];
+        // host + requestPath (covers when runtimeFallbackHost already contains '/api' or the client used '/stations')
+        tryUrls.push(host + requestPath);
+        // If neither host nor path seems to include '/api', try host + '/api' + requestPath
+        if (!host.includes('/api') && requestPath && !requestPath.startsWith('/api')) {
+          tryUrls.push(host + '/api' + requestPath);
+        }
+
+        // Helper to attempt the list of fallback URLs sequentially
+        const attemptSequential = (urls, i = 0) => {
+          if (i >= urls.length) {
+            const msg2 = `API returned HTML (likely the frontend index). Check REACT_APP_API_URL, REACT_APP_API_FALLBACK or window.__API_HOST__ configuration. (api.baseURL=${baseURL})`;
+            return Promise.reject({ message: msg2, response: res });
+          }
+          const u = urls[i];
+          return axios({ method: res.config?.method || 'get', url: u, headers: res.config?.headers || {} })
+            .then(fallbackRes => fallbackRes)
+            .catch(() => attemptSequential(urls, i + 1));
+        };
+
+        return attemptSequential(tryUrls);
       }
       // No fallback configured, return the clear error that tells integrator what to fix.
       if (process.env.NODE_ENV === 'production' && baseURL === '/api') {
