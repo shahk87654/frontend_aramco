@@ -56,7 +56,7 @@ function Review() {
     dispatch({ type: 'error', value: '' });
     if (!state.rating) return dispatch({ type: 'error', value: 'Please provide an overall rating' });
     if (!state.name.trim()) return dispatch({ type: 'error', value: 'Please enter your name' });
-    if (!state.contact.trim()) return dispatch({ type: 'error', value: 'Please enter your contact info' });
+  if (!state.contact.trim()) return dispatch({ type: 'error', value: 'Please enter your phone number' });
     try {
       const gps = await new Promise((resolve) => {
         if (navigator.geolocation) {
@@ -129,7 +129,7 @@ function Review() {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    label="Contact (Phone/Email)"
+                    label="Contact (Phone)"
                     value={state.contact}
                     onChange={e => dispatch({ type: 'set', field: 'contact', value: e.target.value })}
                     fullWidth
