@@ -8,8 +8,8 @@ export function normalizeStations(data) {
   ];
 
   if (!data) {
-    // If running in production and API returned nothing, fall back to sample stations
-    if (process.env.NODE_ENV === 'production') return sampleStations;
+    // No data returned from API: don't silently fall back to sample stations.
+    // Return an empty array so the UI can surface a clear empty state or error.
     return [];
   }
 
@@ -38,7 +38,8 @@ export function normalizeStations(data) {
   }
 
   if (!arr || !Array.isArray(arr) || arr.length === 0) {
-    if (process.env.NODE_ENV === 'production') return sampleStations;
+    // No stations found in API response — return empty array and let the UI
+    // show a helpful message or debugging output.
     return [];
   }
 
