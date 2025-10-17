@@ -17,11 +17,11 @@ const baseURL = process.env.NODE_ENV === 'production'
   : 'http://localhost:5000/api';
 
 // Optional runtime fallback host to try when the client detects the API
-// returned HTML while using the relative '/api' baseURL. Set this in the
-// Vercel environment as REACT_APP_API_FALLBACK (for example
-// https://aramcopakapp-production.up.railway.app). If not set, no retry will
-// be attempted and the original clear error will be returned.
-const runtimeFallbackHost = process.env.REACT_APP_API_FALLBACK || null;
+// returned HTML while using the relative '/api' baseURL. This can be set at
+// build time via REACT_APP_API_FALLBACK or injected at runtime via a global
+// `window.__API_HOST__` (recommended for Vercel static deployments where the
+// build env may not include the API host). Example value: https://api.example.com
+const runtimeFallbackHost = (typeof window !== 'undefined' && window.__API_HOST__) || process.env.REACT_APP_API_FALLBACK || null;
 
 if (process.env.NODE_ENV === 'production' && !process.env.REACT_APP_API_URL) {
   // eslint-disable-next-line no-console
@@ -69,21 +69,25 @@ api.interceptors.response.use(
         // eslint-disable-next-line no-console
         console.warn(`Detected HTML response from /api; attempting one-time retry against fallback host ${runtimeFallbackHost}`);
         // Perform a single retry to the same path against the fallback host.
-        const fallbackUrl = `${runtimeFallbackHost.replace(/\/$/, '')}${res.config?.url || ''}`;
+        // If runtimeFallbackHost is an origin only (no trailing /api), allow callers
+        // to set a full origin or an origin + path. Normalize to origin-like string.
+        const host = runtimeFallbackHost.replace(/\/$/, '');
+        // If runtime host already contains '/api', don't duplicate; otherwise append the requested URL.
+        const fallbackUrl = host + (res.config?.url && host.endsWith(res.config?.url) ? '' : (res.config?.url || ''));
         return axios({
           method: res.config?.method || 'get',
           url: fallbackUrl,
           headers: res.config?.headers || {}
         }).then(fallbackRes => fallbackRes).catch(() => {
           // If fallback fails, return the original helpful error to the caller
-          const msg2 = `API returned HTML (likely the frontend index). Check REACT_APP_API_URL or server routing. (api.baseURL=${baseURL})`;
+          const msg2 = `API returned HTML (likely the frontend index). Check REACT_APP_API_URL, REACT_APP_API_FALLBACK or window.__API_HOST__ configuration. (api.baseURL=${baseURL})`;
           return Promise.reject({ message: msg2, response: res });
         });
       }
       // No fallback configured, return the clear error that tells integrator what to fix.
       if (process.env.NODE_ENV === 'production' && baseURL === '/api') {
         // eslint-disable-next-line no-console
-        console.error('Detected HTML response from API while using relative \'/api\' baseURL. If your frontend is hosted separately from the API, set REACT_APP_API_URL at build time to the API origin (for example https://api.example.com).');
+        console.error('Detected HTML response from API while using relative \'/api\' baseURL. If your frontend is hosted separately from the API, set REACT_APP_API_URL at build time to the API origin (for example https://api.example.com) or provide a runtime host via window.__API_HOST__ or REACT_APP_API_FALLBACK.');
       }
       return Promise.reject({ message: msg, response: res });
     }
