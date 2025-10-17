@@ -12,6 +12,7 @@ function AdminCoupons() {
   const [selectedStation, setSelectedStation] = useState('');
   const [selectedUser, setSelectedUser] = useState('');
   const [selectedReview, setSelectedReview] = useState('');
+  const [count, setCount] = useState(1);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
 
@@ -39,10 +40,11 @@ function AdminCoupons() {
       setError('User and Station required');
       return;
     }
-    axios.post('/api/admin/coupons', { userId: selectedUser, reviewId: selectedReview, stationId: selectedStation }, { headers: { Authorization: `Bearer ${token}` } })
+    axios.post('/api/admin/coupons', { userId: selectedUser, reviewId: selectedReview, stationId: selectedStation, count }, { headers: { Authorization: `Bearer ${token}` } })
       .then(res => {
-        setSuccess('Coupon generated!');
-        setCoupons(coupons => [...coupons, res.data.coupon]);
+        setSuccess('Coupon(s) generated!');
+        const newCoupons = res.data.coupons || (res.data.coupon ? [res.data.coupon] : []);
+        setCoupons(coupons => [...coupons, ...newCoupons]);
       })
       .catch(() => setError('Failed to generate coupon'));
   };
@@ -55,11 +57,12 @@ function AdminCoupons() {
         </Typography>
         <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
           <TextField select label="User" value={selectedUser} onChange={e => setSelectedUser(e.target.value)} sx={{ minWidth: 200 }}>
-            {(Array.isArray(users) ? users : []).map(u => <MenuItem key={u?._id} value={u?._id}>{u?.email || u?.phone}</MenuItem>)}
+            {(Array.isArray(users) ? users : []).map(u => <MenuItem key={u?._id} value={u?._id}>{u?.name || u?.email || u?.phone || 'Unknown'}</MenuItem>)}
           </TextField>
           <TextField select label="Station" value={selectedStation} onChange={e => setSelectedStation(e.target.value)} sx={{ minWidth: 200 }}>
             {(Array.isArray(stations) ? stations : []).map(s => <MenuItem key={s._id} value={s._id}>{s.name}</MenuItem>)}
           </TextField>
+          <TextField type="number" label="Count" value={count} onChange={e => setCount(Math.max(1, Math.min(100, parseInt(e.target.value || '1', 10))))} sx={{ width: 120 }} inputProps={{ min: 1, max: 100 }} />
           <Button variant="contained" color="primary" onClick={handleGenerate}>Generate Coupon</Button>
         </Box>
         <TableContainer component={Paper} sx={{ borderRadius: 3, boxShadow: 4 }}>
@@ -77,7 +80,7 @@ function AdminCoupons() {
               {(Array.isArray(coupons) ? coupons : []).map(c => (
                 <TableRow key={c._id}>
                   <TableCell>{c.code}</TableCell>
-                  <TableCell>{c.user?.email || c.user?.phone || '-'}</TableCell>
+                  <TableCell>{c.claimedBy || c.user?.email || c.user?.phone || c.user?.name || '-'}</TableCell>
                   <TableCell>{c.station?.name || '-'}</TableCell>
                   <TableCell>{c.used ? 'Yes' : 'No'}</TableCell>
                   <TableCell>{new Date(c.createdAt).toLocaleString()}</TableCell>
