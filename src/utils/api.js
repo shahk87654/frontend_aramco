@@ -23,7 +23,16 @@ api.interceptors.request.use(cfg => {
 
 // If any admin API responds with 401, clear admin session state and redirect to admin login
 api.interceptors.response.use(
-  res => res,
+  res => {
+    // Detect accidental HTML responses from API (e.g. frontend index served at /api)
+    const ct = res?.headers?.['content-type'] || '';
+    if (typeof ct === 'string' && ct.indexOf('text/html') !== -1) {
+      // Provide a clearer error payload to the caller
+      const msg = 'API returned HTML (likely the frontend index). Check REACT_APP_API_URL or server routing.';
+      return Promise.reject({ message: msg, response: res });
+    }
+    return res;
+  },
   err => {
     if (err?.response?.status === 401) {
       try {
@@ -36,6 +45,12 @@ api.interceptors.response.use(
       if (typeof window !== 'undefined' && window.location.pathname.indexOf('/admin') === 0) {
         window.location.href = '/admin-login';
       }
+    }
+    // If backend returned HTML for an error response, wrap with clearer message
+    const contentType = err?.response?.headers?.['content-type'] || '';
+    if (typeof contentType === 'string' && contentType.indexOf('text/html') !== -1) {
+      const msg = 'API returned HTML (likely the frontend index). Check REACT_APP_API_URL or server routing.';
+      return Promise.reject({ message: msg, response: err.response });
     }
     return Promise.reject(err);
   }
