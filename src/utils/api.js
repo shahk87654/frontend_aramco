@@ -7,6 +7,11 @@ const baseURL = process.env.NODE_ENV === 'production'
   ? (process.env.REACT_APP_API_URL || '/api')
   : 'http://localhost:5000/api';
 
+if (process.env.NODE_ENV === 'production' && !process.env.REACT_APP_API_URL) {
+  // eslint-disable-next-line no-console
+  console.warn('REACT_APP_API_URL is not set in production; client will use a relative \'/api\' path. If your frontend is served separately from the API, set REACT_APP_API_URL at build time.');
+}
+
 const api = axios.create({
   baseURL,
   headers: {
@@ -27,8 +32,8 @@ api.interceptors.response.use(
     // Detect accidental HTML responses from API (e.g. frontend index served at /api)
     const ct = res?.headers?.['content-type'] || '';
     if (typeof ct === 'string' && ct.indexOf('text/html') !== -1) {
-      // Provide a clearer error payload to the caller
-      const msg = 'API returned HTML (likely the frontend index). Check REACT_APP_API_URL or server routing.';
+      // Provide a clearer error payload to the caller with the resolved baseURL for debugging
+      const msg = `API returned HTML (likely the frontend index). Check REACT_APP_API_URL or server routing. (api.baseURL=${baseURL})`;
       return Promise.reject({ message: msg, response: res });
     }
     return res;
@@ -49,7 +54,7 @@ api.interceptors.response.use(
     // If backend returned HTML for an error response, wrap with clearer message
     const contentType = err?.response?.headers?.['content-type'] || '';
     if (typeof contentType === 'string' && contentType.indexOf('text/html') !== -1) {
-      const msg = 'API returned HTML (likely the frontend index). Check REACT_APP_API_URL or server routing.';
+      const msg = `API returned HTML (likely the frontend index). Check REACT_APP_API_URL or server routing. (api.baseURL=${baseURL})`;
       return Promise.reject({ message: msg, response: err.response });
     }
     return Promise.reject(err);
