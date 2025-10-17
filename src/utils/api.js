@@ -7,9 +7,21 @@ import axios from 'axios';
 // - In development, talk to local server
 // - In production, allow REACT_APP_API_URL override; otherwise use a relative '/api'
 // We also support a runtime fallback re-request if the API returns HTML (frontend index).
+// In production prefer REACT_APP_API_URL; if absent we use a relative '/api'.
+// For deployments where the frontend is hosted separately (Vercel) and the
+// env var wasn't set at build time, allow a one-time runtime fallback to a
+// configured external API host. This avoids the confusing "API returned HTML"
+// errors when the frontend index was served at /api.
 const baseURL = process.env.NODE_ENV === 'production'
   ? (process.env.REACT_APP_API_URL || '/api')
   : 'http://localhost:5000/api';
+
+// Optional runtime fallback host to try when the client detects the API
+// returned HTML while using the relative '/api' baseURL. Set this in the
+// Vercel environment as REACT_APP_API_FALLBACK (for example
+// https://aramcopakapp-production.up.railway.app). If not set, no retry will
+// be attempted and the original clear error will be returned.
+const runtimeFallbackHost = process.env.REACT_APP_API_FALLBACK || null;
 
 if (process.env.NODE_ENV === 'production' && !process.env.REACT_APP_API_URL) {
   // eslint-disable-next-line no-console
@@ -47,18 +59,33 @@ api.interceptors.response.use(
     if (typeof ct === 'string' && ct.indexOf('text/html') !== -1) {
       // Provide a clearer error payload to the caller with the resolved baseURL for debugging
       const msg = `API returned HTML (likely the frontend index). Check REACT_APP_API_URL or server routing. (api.baseURL=${baseURL})`;
-          // If the API returned HTML, it's likely the client build's index.html was served
-          // at the API path (common when the frontend is built separately and the
-          // API URL wasn't set at build time). Don't attempt an automatic external
-          // re-request here (it can cause confusing CORS/auth issues). Instead return
-          // a clear error that tells the integrator what to fix.
-          // The caller can choose to retry against a known host if desired.
-          // Provide a helpful console hint in development for faster debugging.
-          if (process.env.NODE_ENV === 'production' && baseURL === '/api') {
-            // eslint-disable-next-line no-console
-            console.error('Detected HTML response from API while using relative \'/api\' baseURL. If your frontend is hosted separately from the API, set REACT_APP_API_URL at build time to the API origin (for example https://api.example.com).');
-          }
-          return Promise.reject({ message: msg, response: res });
+      // If the API returned HTML, it's likely the client build's index.html was
+      // served at the API path (common when the frontend is built separately
+      // and the API URL wasn't set at build time). Try a one-time runtime
+      // fallback request to a configured external host (if provided) to make
+      // the app resilient on hosts like Vercel where the env var may be
+      // missing at build time.
+      if (process.env.NODE_ENV === 'production' && baseURL === '/api' && runtimeFallbackHost) {
+        // eslint-disable-next-line no-console
+        console.warn(`Detected HTML response from /api; attempting one-time retry against fallback host ${runtimeFallbackHost}`);
+        // Perform a single retry to the same path against the fallback host.
+        const fallbackUrl = `${runtimeFallbackHost.replace(/\/$/, '')}${res.config?.url || ''}`;
+        return axios({
+          method: res.config?.method || 'get',
+          url: fallbackUrl,
+          headers: res.config?.headers || {}
+        }).then(fallbackRes => fallbackRes).catch(() => {
+          // If fallback fails, return the original helpful error to the caller
+          const msg2 = `API returned HTML (likely the frontend index). Check REACT_APP_API_URL or server routing. (api.baseURL=${baseURL})`;
+          return Promise.reject({ message: msg2, response: res });
+        });
+      }
+      // No fallback configured, return the clear error that tells integrator what to fix.
+      if (process.env.NODE_ENV === 'production' && baseURL === '/api') {
+        // eslint-disable-next-line no-console
+        console.error('Detected HTML response from API while using relative \'/api\' baseURL. If your frontend is hosted separately from the API, set REACT_APP_API_URL at build time to the API origin (for example https://api.example.com).');
+      }
+      return Promise.reject({ message: msg, response: res });
     }
     return res;
   },
