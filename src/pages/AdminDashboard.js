@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import api from '../utils/api';
 import normalizeStations from '../utils/stationUtils';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Grid, Card, CardContent, Container, Divider, Chip, Avatar, Paper, TextField, MenuItem, CircularProgress, IconButton, Button } from '@mui/material';
@@ -25,8 +26,8 @@ function AdminDashboard() {
     const token = localStorage.getItem('token');
     setStationLoading(true);
     Promise.all([
-      axios.get('/api/admin/stats', { headers: { Authorization: `Bearer ${token}` } }),
-      axios.get('/api/stations', { headers: { Authorization: `Bearer ${token}` } })
+      api.get('/api/admin/stats'),
+      api.get('/api/stations')
     ])
       .then(([statsRes, stationsRes]) => {
         setStats(statsRes.data);

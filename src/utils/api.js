@@ -25,7 +25,16 @@ const api = axios.create({
 
 // Attach token from localStorage automatically for convenience
 api.interceptors.request.use(cfg => {
-  const token = localStorage.getItem('token');
+  let token = null;
+  try {
+    const raw = localStorage.getItem('token');
+    if (typeof raw === 'string') {
+      const t = raw.trim();
+      if (t && t.toLowerCase() !== 'null' && t.toLowerCase() !== 'undefined') token = t;
+    }
+  } catch (e) {
+    // ignore localStorage errors (e.g., SSR environments)
+  }
   if (token) cfg.headers = { ...cfg.headers, Authorization: `Bearer ${token}` };
   return cfg;
 });

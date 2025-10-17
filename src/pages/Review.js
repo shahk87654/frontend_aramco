@@ -2,6 +2,7 @@ import React, { useEffect, useReducer } from 'react';
 import QRCode from 'qrcode.react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import api from '../utils/api';
 import normalizeStations from '../utils/stationUtils';
 import StarRating from '../components/StarRating';
 import { Box, Card, CardContent, Typography, TextField, Button, Grid, Alert, Container, Divider, Dialog, DialogTitle, DialogContent, IconButton } from '@mui/material';
@@ -67,7 +68,7 @@ function Review() {
           resolve(null);
         }
       });
-      const res = await axios.post('/api/reviews', {
+  const res = await api.post('/api/reviews', {
         stationId,
         rating: state.rating,
         cleanliness: state.cleanliness,
@@ -199,7 +200,7 @@ function Review() {
                           if (!state.showQR || !state.showQR.code) return;
                           setClaiming(true);
                           try {
-                            await axios.post('/api/rewards/claim', { code: state.showQR.code }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+                            await api.post('/api/rewards/claim', { code: state.showQR.code });
                             // mark as claimed in UI and close dialog
                             dispatch({ type: 'showQR', value: null });
                             // update success payload so visits/coupons reflect claimed state if needed
