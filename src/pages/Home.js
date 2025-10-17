@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import api from '../utils/api';
 import normalizeStations from '../utils/stationUtils';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Grid, Card, CardContent, CardActions, Button, AppBar, Toolbar, Container } from '@mui/material';
@@ -15,14 +16,11 @@ function Home() {
   const isAdmin = localStorage.getItem('isAdmin') === 'true';
 
   useEffect(() => {
-    const apiUrl = process.env.NODE_ENV === 'production'
-      ? '/api/stations'
-      : '/api/stations';
-      
-    axios.get(apiUrl)
+    // Use centralized api instance so baseURL/headers are consistent
+    api.get('/stations')
       .then(res => {
-        // keep raw response for debugging when stations missing
-        setRawStationsResp(res.data);
+        // keep raw response (full) for debugging when stations missing
+        setRawStationsResp(res);
         const norm = normalizeStations(res.data);
         console.debug('Stations API raw:', res.data, 'normalized ->', norm);
         setStations(norm);

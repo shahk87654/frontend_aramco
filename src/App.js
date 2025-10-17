@@ -7,8 +7,6 @@ import Reward from './pages/Reward';
 import Admin from './pages/Admin';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminReviews from './pages/AdminReviews';
-import RewardScan from './pages/RewardScan';
-import RewardSearch from './pages/RewardSearch';
 import MyRewards from './pages/MyRewards';
 import AdminLogin from './pages/AdminLogin';
 
@@ -28,8 +26,7 @@ function App() {
       {/* <Route path="/register" element={<Register />} /> */}
       <Route path="/reward/:code" element={<Reward />} />
       <Route path="/my-rewards" element={<MyRewards />} />
-      <Route path="/reward-search" element={<RewardSearch />} />
-      <Route path="/reward-scan" element={<RewardScan />} />
+  {/* Reward search/scan removed - functionality disabled */}
       <Route path="/admin/*" element={<RequireAdmin><Admin /></RequireAdmin>} />
       <Route path="/admin/dashboard" element={<RequireAdmin><AdminDashboard /></RequireAdmin>} />
       <Route path="/admin/reviews" element={<RequireAdmin><AdminReviews /></RequireAdmin>} />

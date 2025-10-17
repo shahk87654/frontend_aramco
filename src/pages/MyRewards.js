@@ -30,6 +30,19 @@ function MyRewards() {
     }
   };
 
+  // Listen for claim events so the UI can refresh automatically
+  React.useEffect(() => {
+    const onClaim = (e) => {
+      // if phone is present, re-run last search to refresh coupons
+      if (phone && phone.trim()) {
+        // construct a fake event object for handleSearch
+        handleSearch({ preventDefault: () => {} });
+      }
+    };
+    window.addEventListener('couponClaimed', onClaim);
+    return () => window.removeEventListener('couponClaimed', onClaim);
+  }, [phone]);
+
   return (
     <Box sx={{ bgcolor: 'linear-gradient(135deg, #e0e7ff 0%, #f5f6fa 100%)', minHeight: '100vh', py: 6 }}>
       <Container maxWidth="sm">

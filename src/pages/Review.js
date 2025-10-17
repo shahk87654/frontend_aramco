@@ -37,6 +37,9 @@ function Review() {
   }
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  // Local UI state for claim in QR dialog
+  const [claiming, setClaiming] = React.useState(false);
+
   useEffect(() => {
     axios.get(`/api/stations?stationId=${stationId}`)
       .then(res => {
@@ -80,9 +83,9 @@ function Review() {
       dispatch({ type: 'success', value: res.data });
       // Show visits and visits left before QR
       if (res.data.coupon) {
+        // Show QR dialog with claim button. Do not auto-navigate to reward page.
         setTimeout(() => {
           dispatch({ type: 'showQR', value: { code: res.data.coupon.code, name: state.name, contact: state.contact } });
-          setTimeout(() => navigate(`/reward/${res.data.coupon.code}`), 4000);
         }, 2500);
       }
     } catch (err) {
@@ -188,6 +191,33 @@ function Review() {
                   <>
                     <QRCode value={state.showQR.code + '|' + state.showQR.name + '|' + state.showQR.contact} size={140} style={{ margin: '16px 0' }} />
                     <Typography variant="body2" sx={{ mt: 2 }}>Name: {state.showQR.name} <br />Contact: {state.showQR.contact}</Typography>
+                    <Box sx={{ mt: 2 }}>
+                      <Button
+                        variant="contained"
+                        color="success"
+                        onClick={async () => {
+                          if (!state.showQR || !state.showQR.code) return;
+                          setClaiming(true);
+                          try {
+                            await axios.post('/api/rewards/claim', { code: state.showQR.code }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+                            // mark as claimed in UI and close dialog
+                            dispatch({ type: 'showQR', value: null });
+                            // update success payload so visits/coupons reflect claimed state if needed
+                            dispatch({ type: 'success', value: { ...state.success, couponClaimed: state.showQR.code } });
+                            // notify other pages (MyRewards) to refresh their data
+                            try { window.dispatchEvent(new CustomEvent('couponClaimed', { detail: { code: state.showQR.code } })); } catch (e) {}
+                          } catch (err) {
+                            // show a simple alert on failure
+                            alert('Failed to claim coupon: ' + (err.response?.data?.msg || err.message || 'Error'));
+                          }
+                          setClaiming(false);
+                        }}
+                        disabled={claiming}
+                        sx={{ mt: 1, fontWeight: 700 }}
+                      >
+                        {claiming ? 'Claiming...' : 'Claimed'}
+                      </Button>
+                    </Box>
                   </>
                 )}
               </DialogContent>

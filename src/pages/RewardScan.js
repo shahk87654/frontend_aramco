@@ -14,7 +14,6 @@ function RewardScan() {
   const detectorRef = useRef(null);
   const canvasRef = useRef(null);
   const scanIntervalRef = useRef(null);
-  const scannedRef = useRef(false);
 
   const handleSubmit = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
@@ -29,46 +28,6 @@ function RewardScan() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const playBeep = () => {
-    try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.type = 'sine';
-      o.frequency.value = 1000;
-      g.gain.value = 0.1;
-      o.connect(g);
-      g.connect(ctx.destination);
-      o.start();
-      setTimeout(() => { try { o.stop(); ctx.close(); } catch (e) {} }, 120);
-    } catch (e) {
-      // ignore audio errors
-    }
-  };
-
-  const processDetectedCode = (codeValue) => {
-    if (!codeValue) return;
-    if (scannedRef.current) return;
-    scannedRef.current = true;
-    setCode(codeValue);
-    playBeep();
-    try { navigator.vibrate && navigator.vibrate(120); } catch (e) {}
-    stopCamera();
-    // submit directly using axios to avoid race with setCode
-    (async () => {
-      setLoading(true);
-      setError('');
-      try {
-        const res = await axios.post('/api/rewards/scan', { code: codeValue });
-        setResult(res.data);
-      } catch (err) {
-        setError(err?.response?.data?.message || 'Failed to process code');
-      } finally {
-        setLoading(false);
-      }
-    })();
   };
 
   useEffect(() => {
@@ -100,8 +59,7 @@ function RewardScan() {
         // ignore permission query errors
       }
 
-      // ask for a fairly high-res frame to improve detection
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } } });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         // ensure attributes for autoplay on mobile
@@ -109,11 +67,11 @@ function RewardScan() {
         videoRef.current.muted = true;
         videoRef.current.playsInline = true;
         try {
-          // ensure this is called from a user gesture (button click) to avoid autoplay blocks
-          const p = videoRef.current.play();
-          if (p && p.then) p.catch(err => console.warn('video play rejected', err));
+          await videoRef.current.play();
         } catch (playErr) {
+          // some browsers require user gesture; set a camera error but keep stream
           console.warn('video play failed', playErr);
+          setCameraError('Camera started but video play was prevented by browser (user gesture may be required)');
         }
       }
 
@@ -132,19 +90,13 @@ function RewardScan() {
         if (!videoRef.current) return;
         try {
           if (detectorRef.current) {
-            // BarcodeDetector may accept ImageBitmap better in some browsers
-            try {
-              const maybeBitmap = typeof createImageBitmap === 'function' ? await createImageBitmap(videoRef.current) : null;
-              const barcodes = maybeBitmap ? await detectorRef.current.detect(maybeBitmap) : await detectorRef.current.detect(videoRef.current);
-              if (barcodes && barcodes.length > 0) {
-                const codeValue = barcodes[0].rawValue;
-                if (codeValue) {
-                  processDetectedCode(codeValue);
-                }
+            const barcodes = await detectorRef.current.detect(videoRef.current);
+            if (barcodes && barcodes.length > 0) {
+              const codeValue = barcodes[0].rawValue;
+              if (codeValue) {
+                setCode(codeValue);
+                stopCamera();
               }
-              if (maybeBitmap) try { maybeBitmap.close && maybeBitmap.close(); } catch (e) {}
-            } catch (dErr) {
-              console.warn('BarcodeDetector detect error, falling back', dErr);
             }
             return;
           }
@@ -166,7 +118,8 @@ function RewardScan() {
           const imageData = ctx.getImageData(0, 0, width, height);
           const codeObj = jsQR(imageData.data, width, height, { inversionAttempts: 'attemptBoth' });
           if (codeObj && codeObj.data) {
-            processDetectedCode(codeObj.data);
+            setCode(codeObj.data);
+            stopCamera();
           }
         } catch (err) {
           // capture camera errors and show to user
