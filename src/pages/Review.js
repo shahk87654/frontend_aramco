@@ -172,6 +172,15 @@ function Review() {
                     Submit Review
                   </Button>
                 </Grid>
+                <Grid item xs={12}>
+                  <Typography
+                    variant="body2"
+                    sx={{ textAlign: 'center', mt: 1, cursor: 'pointer', textDecoration: 'underline', color: '#1976d2' }}
+                    onClick={() => dispatch({ type: 'openDisclaimer' })}
+                  >
+                    View Disclaimer
+                  </Typography>
+                </Grid>
               </Grid>
             </form>
             {state.error && <Alert severity="error" sx={{ mt: 2 }}>{state.error}</Alert>}
@@ -225,6 +234,30 @@ function Review() {
                     </Box>
                   </>
                 )}
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={state.disclaimerDialogOpen} onClose={() => dispatch({ type: 'closeDisclaimer' })} maxWidth="sm" fullWidth>
+              <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span>Disclaimer</span>
+                <IconButton onClick={() => dispatch({ type: 'closeDisclaimer' })} size="small"><CloseIcon /></IconButton>
+              </DialogTitle>
+              <DialogContent>
+                <Typography variant="body2" sx={{ mb: 2 }}>
+                  The Aramco Reviews App is designed to collect customer feedback for service improvement purposes only. All reviews submitted through this platform are recorded to help enhance customer experience at Aramco fuel stations.
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 2 }}>
+                  Rewards, offers, or complimentary items (if applicable) are subject to availability, station participation, and internal policies. Submission of a review does not guarantee fulfillment of any reward or claim.
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 2 }}>
+                  Aramco Pakistan reserves the right to verify, approve, modify, or decline any review, reward, or claim in case of misuse, duplication, technical issues, or violation of platform guidelines.
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 2 }}>
+                  For any queries, concerns, or unfulfilled claims, please contact us at aramcostations@gno.com.pk
+                </Typography>
+                <Typography variant="body2">
+                  By using this application, you acknowledge and agree to this disclaimer.
+                </Typography>
               </DialogContent>
             </Dialog>
           </CardContent>
