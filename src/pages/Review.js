@@ -24,7 +24,8 @@ function Review() {
     error: '',
     success: null,
   showQR: null,
-  qrDialogOpen: false
+  qrDialogOpen: false,
+  disclaimerDialogOpen: false
   };
   function reducer(state, action) {
     switch (action.type) {
@@ -32,6 +33,8 @@ function Review() {
       case 'error': return { ...state, error: action.value };
       case 'success': return { ...state, success: action.value };
   case 'showQR': return { ...state, showQR: action.value, qrDialogOpen: true };
+      case 'openDisclaimer': return { ...state, disclaimerDialogOpen: true };
+      case 'closeDisclaimer': return { ...state, disclaimerDialogOpen: false };
       case 'reset': return initialState;
       default: return state;
     }
@@ -181,6 +184,7 @@ function Review() {
                   : `Visits left for free coffee: ${state.success.visitsLeft}`}
               </Alert>
             )}
+           
             <Dialog open={!!state.qrDialogOpen} onClose={() => dispatch({ type: 'showQR', value: null })} maxWidth="xs" fullWidth>
               <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span>🎉 You won a free tea!</span>
