@@ -107,12 +107,12 @@ function Review() {
   );
 
   return (
-    <Box sx={{ bgcolor: 'linear-gradient(135deg, #e0e7ff 0%, #f5f6fa 100%)', minHeight: '100vh', py: 6 }}>
+    <Box sx={{ bgcolor: 'linear-gradient(135deg, #F4F6F8 0%, #FFFFFF 100%)', minHeight: '100vh', py: 6 }}>
       <Container maxWidth="sm">
         <Card sx={{ boxShadow: 6, borderRadius: 4, p: 2 }}>
           <CardContent>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <LocalGasStationIcon sx={{ fontSize: 36, color: '#1976d2', mr: 1 }} />
+              <LocalGasStationIcon sx={{ fontSize: 36, color: 'primary.main', mr: 1 }} />
               <Box>
                 <Typography variant="h5" sx={{ fontWeight: 700, color: '#1976d2' }}>{station.name}</Typography>
                 <Typography variant="body2" color="text.secondary">Station ID: {station.stationId}</Typography>

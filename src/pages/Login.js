@@ -24,11 +24,11 @@ function Login() {
   };
 
   return (
-    <Box sx={{ bgcolor: 'linear-gradient(135deg, #e0e7ff 0%, #f5f6fa 100%)', minHeight: '100vh', py: 8 }}>
+    <Box sx={{ bgcolor: 'linear-gradient(135deg, #F4F6F8 0%, #FFFFFF 100%)', minHeight: '100vh', py: 8 }}>
       <Container maxWidth="xs">
         <Card sx={{ boxShadow: 6, borderRadius: 4 }}>
           <CardContent>
-            <Typography variant="h5" sx={{ fontWeight: 700, color: '#1976d2', mb: 2 }} align="center">Login</Typography>
+            <Typography variant="h5" sx={{ fontWeight: 700, color: 'primary.main', mb: 2 }} align="center">Login</Typography>
             <form onSubmit={handleSubmit}>
               <TextField label="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} fullWidth margin="normal" />
               <TextField label="Phone" type="tel" value={phone} onChange={e => setPhone(e.target.value)} fullWidth margin="normal" />

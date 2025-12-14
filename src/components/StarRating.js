@@ -6,7 +6,7 @@ function StarRating({ value, onChange }) {
       {[1,2,3,4,5].map(star => (
         <span
           key={star}
-          style={{ cursor: 'pointer', color: value >= star ? 'gold' : 'gray', fontSize: 24 }}
+          style={{ cursor: 'pointer', color: value >= star ? '#FBBF24' : '#D1D5DB', fontSize: 24 }}
           onClick={() => onChange(star)}
         >
           ★

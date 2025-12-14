@@ -39,8 +39,8 @@ function Home() {
   return (
     <Box sx={{
       minHeight: '100vh',
-      bgcolor: 'linear-gradient(135deg, #e0e7ff 0%, #f5f6fa 100%)',
-      background: 'linear-gradient(135deg, #e0e7ff 0%, #f5f6fa 100%)',
+      bgcolor: 'linear-gradient(135deg, #F4F6F8 0%, #FFFFFF 100%)',
+      background: 'linear-gradient(135deg, #F4F6F8 0%, #FFFFFF 100%)',
       display: 'flex',
       flexDirection: 'column'
     }}>
@@ -65,7 +65,7 @@ function Home() {
       <Box sx={{
         width: '100%',
         py: 6,
-        background: 'linear-gradient(120deg, #1976d2 60%, #42a5f5 100%)',
+        background: 'linear-gradient(120deg, #006C35 60%, #0F766E 100%)',
         color: 'white',
         textAlign: 'center',
         mb: 4,
@@ -80,7 +80,7 @@ function Home() {
         </Typography>
       </Box>
       <Container maxWidth="md" sx={{ flex: 1, pb: 4 }}>
-        <Typography variant="h4" align="center" gutterBottom sx={{ fontWeight: 700, color: '#1976d2' }}>
+        <Typography variant="h4" align="center" gutterBottom sx={{ fontWeight: 700, color: 'primary.main' }}>
           Select a Station
         </Typography>
         <Typography align="center" sx={{ mb: 4, color: '#555' }}>
@@ -139,7 +139,7 @@ function Home() {
                 }
               }}>
                 <CardContent>
-                  <Typography variant="h6" sx={{ fontWeight: 600, color: '#1976d2', mb: 1 }}>{station.name}</Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main', mb: 1 }}>{station.name}</Typography>
                   <Typography variant="body2" color="text.secondary">Station ID: {station.stationId}</Typography>
                 </CardContent>
                 <CardActions>
@@ -153,7 +153,7 @@ function Home() {
         </Grid>
       </Container>
       {/* Footer */}
-      <Box sx={{ bgcolor: '#1976d2', color: 'white', py: 2, textAlign: 'center', mt: 'auto', boxShadow: 2 }}>
+      <Box sx={{ bgcolor: 'primary.main', color: 'white', py: 2, textAlign: 'center', mt: 'auto', boxShadow: 2 }}>
         <Typography variant="body2">
           &copy; {new Date().getFullYear()} Aramco Review Platform. All rights reserved.
         </Typography>
