@@ -11,7 +11,15 @@ function AdminLogin() {
   const handleSubmit = e => {
     e.preventDefault();
     setError('');
-    if (username === 'GO' && password === '12345') {
+    const validCredentials = [
+      { username: 'GO', password: '12345' },
+      { username: 'jawad.arshad@gno.com.pk', password: 'Jawad@123' },
+      { username: 'awais.javed@gno.com.pk', password: 'Awais@123' }
+    ];
+    
+    const isValid = validCredentials.some(cred => cred.username === username && cred.password === password);
+    
+    if (isValid) {
       // Mark admin in localStorage and set a short-lived dev token so admin API calls include Authorization header
       // record login time so we can enforce a cooldown/expiry (18 hours)
       localStorage.setItem('isAdmin', 'true');
