@@ -9,7 +9,9 @@ import {
   Typography,
   AppBar,
   Toolbar,
-  Divider,
+  Paper,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import AdminDashboard from './AdminDashboard';
@@ -27,6 +29,8 @@ import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
 function Admin() {
   const [tab, setTab] = useState(0);
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
 
   const handleLogout = () => {
     // Remove admin flags and token from localStorage
@@ -36,35 +40,46 @@ function Admin() {
   };
 
   const navItems = [
-    { label: 'Dashboard', icon: <DashboardIcon sx={{ mr: 1 }} /> },
-    { label: 'Reviews', icon: <RateReviewIcon sx={{ mr: 1 }} /> },
-    { label: 'Coupons', icon: <LocalOfferIcon sx={{ mr: 1 }} /> },
-    { label: 'Coupon Stats', icon: <AnalyticsIcon sx={{ mr: 1 }} /> },
-    { label: 'Generate Coupons', icon: <CardGiftcardIcon sx={{ mr: 1 }} /> },
+    { label: 'Dashboard', icon: <DashboardIcon fontSize="small" /> },
+    { label: 'Reviews', icon: <RateReviewIcon fontSize="small" /> },
+    { label: 'Coupons', icon: <LocalOfferIcon fontSize="small" /> },
+    { label: 'Coupon Stats', icon: <AnalyticsIcon fontSize="small" /> },
+    { label: 'Generate Coupons', icon: <CardGiftcardIcon fontSize="small" /> },
   ];
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#f5f6fa' }}>
-      {/* Top Navigation Bar */}
-      <AppBar position="sticky" sx={{ backgroundColor: '#1976d2', boxShadow: 3 }}>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        background: 'radial-gradient(circle at top left, #e3f2fd 0, #f5f6fa 40%, #ffffff 100%)',
+      }}
+    >
+      {/* Top Bar */}
+      <AppBar
+        position="static"
+        elevation={0}
+        sx={{
+          backgroundColor: 'rgba(255,255,255,0.9)',
+          backdropFilter: 'blur(8px)',
+          borderBottom: '1px solid #e0e0e0',
+        }}
+      >
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Typography
-              variant="h6"
-              sx={{ fontWeight: 800, color: 'white', fontSize: '1.3rem', letterSpacing: 0.5 }}
-            >
-              ARAMCO ADMIN
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 800, color: '#1976d2', letterSpacing: 0.5 }}>
+              Admin Console
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Manage reviews, stations, and coupons
             </Typography>
           </Box>
           <Button
-            color="inherit"
-            variant="outlined"
+            size="small"
+            color="error"
             startIcon={<LogoutIcon />}
             onClick={handleLogout}
-            sx={{
-              borderColor: 'rgba(255,255,255,0.5)',
-              '&:hover': { borderColor: 'white', backgroundColor: 'rgba(255,255,255,0.1)' },
-            }}
+            sx={{ textTransform: 'none', borderRadius: 999 }}
+            variant="outlined"
           >
             Logout
           </Button>
@@ -72,89 +87,84 @@ function Admin() {
       </AppBar>
 
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        {/* Section Title */}
-        <Box sx={{ mb: 3 }}>
-          <Typography
-            variant="h5"
-            sx={{
-              fontWeight: 700,
-              color: '#1976d2',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-            }}
-          >
-            {navItems[tab].icon}
-            {navItems[tab].label}
-          </Typography>
-        </Box>
-
-        {/* Tab Navigation */}
-        <Box
+        <Paper
+          elevation={3}
           sx={{
-            backgroundColor: 'white',
-            borderRadius: 2,
-            boxShadow: 2,
-            mb: 4,
-            overflow: 'hidden',
+            borderRadius: 3,
+            p: 2.5,
+            display: 'flex',
+            flexDirection: { xs: 'column', md: 'row' },
+            gap: 3,
+            boxShadow: '0 12px 35px rgba(15, 23, 42, 0.08)',
           }}
         >
-          <Tabs
-            value={tab}
-            onChange={(_, v) => setTab(v)}
-            variant="scrollable"
-            scrollButtons="auto"
+          {/* Modern side navigation */}
+          <Box
             sx={{
-              borderBottom: '1px solid #e0e0e0',
-              '& .MuiTab-root': {
-                textTransform: 'none',
-                fontSize: '1rem',
-                fontWeight: 600,
-                minHeight: 60,
-                color: '#666',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  backgroundColor: '#f5f5f5',
-                  color: '#1976d2',
-                },
-              },
-              '& .MuiTab-root.Mui-selected': {
-                color: '#1976d2',
-                borderBottom: '3px solid #1976d2',
-                backgroundColor: 'rgba(25, 118, 210, 0.05)',
-              },
+              minWidth: { xs: '100%', md: 230 },
+              borderRight: { xs: 'none', md: '1px solid #e0e0e0' },
+              borderBottom: { xs: '1px solid #e0e0e0', md: 'none' },
+              pr: { md: 2 },
+              pb: { xs: 2, md: 0 },
             }}
           >
-            {navItems.map((item) => (
-              <Tab
-                key={item.label}
-                label={
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    {item.icon}
-                    {item.label}
-                  </Box>
-                }
-              />
-            ))}
-          </Tabs>
-        </Box>
+            <Typography variant="overline" sx={{ mb: 1.5, color: 'text.secondary', letterSpacing: 1 }}>
+              Sections
+            </Typography>
+            <Tabs
+              value={tab}
+              onChange={(_, v) => setTab(v)}
+              orientation={isDesktop ? 'vertical' : 'horizontal'}
+              variant="scrollable"
+              sx={{
+                '& .MuiTabs-indicator': {
+                  left: isDesktop ? 0 : 'auto',
+                  right: isDesktop ? 'auto' : 0,
+                  width: isDesktop ? 3 : '100%',
+                  borderRadius: isDesktop ? '0 999px 999px 0' : '999px 999px 0 0',
+                },
+                '& .MuiTab-root': {
+                  alignItems: 'flex-start',
+                  textTransform: 'none',
+                  fontSize: 14,
+                  justifyContent: 'flex-start',
+                  minHeight: 40,
+                  borderRadius: isDesktop ? 2 : 999,
+                  px: 1.5,
+                  mr: isDesktop ? 0 : 1,
+                  mb: isDesktop ? 0.5 : 0,
+                  '&.Mui-selected': {
+                    backgroundColor: 'rgba(25,118,210,0.08)',
+                    color: '#1976d2',
+                  },
+                },
+              }}
+            >
+              {navItems.map((item, index) => (
+                <Tab
+                  key={item.label}
+                  value={index}
+                  label={
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      {item.icon}
+                      <Typography variant="body2">{item.label}</Typography>
+                    </Box>
+                  }
+                />
+              ))}
+            </Tabs>
+          </Box>
 
-        {/* Content Area */}
-        <Box sx={{ animation: 'fadeIn 0.3s ease-in' }}>
-          {tab === 0 && <AdminDashboard />}
-          {tab === 1 && <AdminReviews />}
-          {tab === 2 && <AdminCoupons />}
-          {tab === 3 && <AdminCouponStats />}
-          {tab === 4 && <AdminManualCoupon />}
-        </Box>
+          {/* Content Area */}
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            {tab === 0 && <AdminDashboard />}
+            {tab === 1 && <AdminReviews />}
+            {tab === 2 && <AdminCoupons />}
+            {tab === 3 && <AdminCouponStats />}
+            {tab === 4 && <AdminManualCoupon />}
+          </Box>
+        </Paper>
       </Container>
-
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-      `}</style>
     </Box>
   );
 }
