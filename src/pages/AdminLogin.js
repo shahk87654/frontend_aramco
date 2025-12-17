@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Card, CardContent, Typography, TextField, Button, Alert, Container } from '@mui/material';
+import logo from '../assets/logo.jpg';
 
 function AdminLogin() {
   const [username, setUsername] = useState('');
@@ -39,7 +40,7 @@ function AdminLogin() {
             <Box sx={{ textAlign: 'center', mb: 2 }}>
               <Box
                 component="img"
-                src={process.env.PUBLIC_URL + '/logo.jpg'}
+                src={logo}
                 alt="Aramco Logo"
                 sx={{ height: 56, objectFit: 'contain', mx: 'auto', mb: 1 }}
               />

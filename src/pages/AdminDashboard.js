@@ -11,6 +11,7 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import StarIcon from '@mui/icons-material/Star';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
+import logo from '../assets/logo.jpg';
 
 function AdminDashboard() {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ function AdminDashboard() {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             <Box
               component="img"
-              src={process.env.PUBLIC_URL + '/logo.jpg'}
+              src={logo}
               alt="Aramco Logo"
               sx={{ height: 52, objectFit: 'contain' }}
             />

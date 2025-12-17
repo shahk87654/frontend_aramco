@@ -1,4 +1,5 @@
 import React, { useEffect, useReducer } from 'react';
+import logo from '../assets/logo.jpg';
 import QRCode from 'qrcode.react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -112,7 +113,7 @@ function Review() {
         <Box sx={{ textAlign: 'center', mb: 2 }}>
           <Box
             component="img"
-            src={process.env.PUBLIC_URL + '/logo.jpg'}
+            src={logo}
             alt="Aramco Logo"
             sx={{ height: 64, objectFit: 'contain', mx: 'auto' }}
           />
