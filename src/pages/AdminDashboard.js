@@ -53,7 +53,7 @@ function AdminDashboard() {
               component="img"
               src={logo}
               alt="Aramco Logo"
-              sx={{ display: 'block', maxWidth: '100%', height: 'auto' }}
+              sx={{ display: 'block', height: 40, width: 'auto' }}
             />
             <Typography variant="h4" sx={{ fontWeight: 800, color: '#1976d2' }}>
               <BarChartIcon sx={{ fontSize: 36, mb: -1, mr: 1 }} /> Admin Dashboard
