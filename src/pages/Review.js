@@ -109,6 +109,14 @@ function Review() {
   return (
     <Box sx={{ bgcolor: 'linear-gradient(135deg, #e0e7ff 0%, #f5f6fa 100%)', minHeight: '100vh', py: 6 }}>
       <Container maxWidth="sm">
+        <Box sx={{ textAlign: 'center', mb: 2 }}>
+          <Box
+            component="img"
+            src="/logo.jpg"
+            alt="Aramco Logo"
+            sx={{ height: 64, objectFit: 'contain', mx: 'auto' }}
+          />
+        </Box>
         <Card sx={{ boxShadow: 6, borderRadius: 4, p: 2 }}>
           <CardContent>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>

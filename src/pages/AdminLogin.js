@@ -36,7 +36,15 @@ function AdminLogin() {
       <Container maxWidth="xs">
         <Card sx={{ boxShadow: 6, borderRadius: 4 }}>
           <CardContent>
-            <Typography variant="h5" sx={{ fontWeight: 700, color: '#1976d2', mb: 2 }} align="center">Admin Login</Typography>
+            <Box sx={{ textAlign: 'center', mb: 2 }}>
+              <Box
+                component="img"
+                src="/logo.jpg"
+                alt="Aramco Logo"
+                sx={{ height: 56, objectFit: 'contain', mx: 'auto', mb: 1 }}
+              />
+              <Typography variant="h5" sx={{ fontWeight: 700, color: '#1976d2' }} align="center">Admin Login</Typography>
+            </Box>
             <form onSubmit={handleSubmit}>
               <TextField label="Username" value={username} onChange={e => setUsername(e.target.value)} fullWidth margin="normal" />
               <TextField label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} fullWidth margin="normal" />

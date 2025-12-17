@@ -47,9 +47,17 @@ function AdminDashboard() {
     <Box sx={{ bgcolor: 'linear-gradient(135deg, #e0e7ff 0%, #f5f6fa 100%)', minHeight: '100vh', py: 6 }}>
       <Container maxWidth="md">
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 4 }}>
-          <Typography variant="h4" sx={{ fontWeight: 800, color: '#1976d2' }}>
-            <BarChartIcon sx={{ fontSize: 36, mb: -1, mr: 1 }} /> Admin Dashboard
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Box
+              component="img"
+              src="/logo.jpg"
+              alt="Aramco Logo"
+              sx={{ height: 52, objectFit: 'contain' }}
+            />
+            <Typography variant="h4" sx={{ fontWeight: 800, color: '#1976d2' }}>
+              <BarChartIcon sx={{ fontSize: 36, mb: -1, mr: 1 }} /> Admin Dashboard
+            </Typography>
+          </Box>
           <Button color="error" variant="outlined" onClick={() => { localStorage.removeItem('isAdmin'); localStorage.removeItem('token'); window.location.href = '/admin-login'; }}>Logout</Button>
         </Box>
         <Grid container spacing={3} sx={{ mb: 4 }}>
