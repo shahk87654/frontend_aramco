@@ -192,7 +192,7 @@ function Review() {
               </Typography>
 
               <Typography variant="body2" sx={{ mb: 2 }}>
-                <strong>Rewards against completion and submission of reviews must be claimed on Aramco's A-Stops only on specific nominated products</strong>
+                <strong>Rewards against completion and submission of reviews must be claimed on Aramco A-Stop only on specific nominated products</strong>
               </Typography>
 
               <Typography variant="body2" sx={{ mb: 2 }}>
