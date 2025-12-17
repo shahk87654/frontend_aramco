@@ -172,14 +172,6 @@ function Review() {
                     Submit Review
                   </Button>
                 </Grid>
-                <Grid item xs={12}>
-                  <Typography
-                    variant="body2"
-                    sx={{ textAlign: 'center', mt: 1, cursor: 'pointer', textDecoration: 'underline', color: '#1976d2' }}
-                    onClick={() => dispatch({ type: 'openDisclaimer' })}
-                  >
-                    View Disclaimer
-                  </Typography>
                 </Grid>
               </Grid>
             </form>
