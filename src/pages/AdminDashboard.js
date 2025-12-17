@@ -11,7 +11,7 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import StarIcon from '@mui/icons-material/Star';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
-import logo from '../assets/logo.jpg';
+import logo from '../assets/retail-logo.jpg';
 
 function AdminDashboard() {
   const navigate = useNavigate();
@@ -53,7 +53,7 @@ function AdminDashboard() {
               component="img"
               src={logo}
               alt="Aramco Logo"
-              sx={{ height: 52, objectFit: 'contain' }}
+              sx={{ display: 'block', maxWidth: '100%', height: 'auto' }}
             />
             <Typography variant="h4" sx={{ fontWeight: 800, color: '#1976d2' }}>
               <BarChartIcon sx={{ fontSize: 36, mb: -1, mr: 1 }} /> Admin Dashboard

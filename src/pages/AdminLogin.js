@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Card, CardContent, Typography, TextField, Button, Alert, Container } from '@mui/material';
-import logo from '../assets/logo.jpg';
+import logo from '../assets/retail-logo.jpg';
 
 function AdminLogin() {
   const [username, setUsername] = useState('');
@@ -42,7 +42,7 @@ function AdminLogin() {
                 component="img"
                 src={logo}
                 alt="Aramco Logo"
-                sx={{ height: 56, objectFit: 'contain', mx: 'auto', mb: 1 }}
+                sx={{ display: 'block', mx: 'auto', maxWidth: '100%', height: 'auto', mb: 1 }}
               />
               <Typography variant="h5" sx={{ fontWeight: 700, color: '#1976d2' }} align="center">Admin Login</Typography>
             </Box>

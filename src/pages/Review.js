@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer } from 'react';
-import logo from '../assets/logo.jpg';
+import logo from '../assets/retail-logo.jpg';
 import QRCode from 'qrcode.react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -115,7 +115,7 @@ function Review() {
             component="img"
             src={logo}
             alt="Aramco Logo"
-            sx={{ height: 64, objectFit: 'contain', mx: 'auto' }}
+            sx={{ display: 'block', mx: 'auto', maxWidth: '100%', height: 'auto' }}
           />
         </Box>
         <Card sx={{ boxShadow: 6, borderRadius: 4, p: 2 }}>
