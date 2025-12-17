@@ -183,6 +183,16 @@ function Review() {
                 </Grid>
               </Grid>
             </form>
+            <Divider sx={{ my: 3 }} />
+            <Box sx={{ backgroundColor: '#f5f5f5', border: '1px solid #e0e0e0', borderRadius: 2, p: 2, mt: 2 }}>
+              <Typography sx={{ fontWeight: 600, mb: 1, color: '#1976d2' }}>Rewards Disclaimer</Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                <strong>Rewards against completion and submission of reviews must be claimed on Aramco's A-Stops only on specific nominated products</strong>
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#666' }}>
+                Rewards, offers, or complimentary items are subject to availability, station participation, and internal policies. Submission of a review does not guarantee fulfillment of any reward or claim.
+              </Typography>
+            </Box>
             {state.error && <Alert severity="error" sx={{ mt: 2 }}>{state.error}</Alert>}
             {state.success && !state.showQR && (
               <Alert severity="success" sx={{ mt: 2 }}>
