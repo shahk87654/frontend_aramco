@@ -50,7 +50,7 @@ function AdminDashboard() {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             <Box
               component="img"
-              src="/logo.jpg"
+              src={process.env.PUBLIC_URL + '/logo.jpg'}
               alt="Aramco Logo"
               sx={{ height: 52, objectFit: 'contain' }}
             />

@@ -112,7 +112,7 @@ function Review() {
         <Box sx={{ textAlign: 'center', mb: 2 }}>
           <Box
             component="img"
-            src="/logo.jpg"
+            src={process.env.PUBLIC_URL + '/logo.jpg'}
             alt="Aramco Logo"
             sx={{ height: 64, objectFit: 'contain', mx: 'auto' }}
           />
