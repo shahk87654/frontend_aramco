@@ -176,12 +176,30 @@ function Review() {
             </form>
             <Divider sx={{ my: 3 }} />
             <Box sx={{ backgroundColor: '#f5f5f5', border: '1px solid #e0e0e0', borderRadius: 2, p: 2, mt: 2 }}>
-              <Typography sx={{ fontWeight: 600, mb: 1, color: '#1976d2' }}>Rewards Disclaimer</Typography>
-              <Typography variant="body2" sx={{ mb: 1 }}>
+              <Typography sx={{ fontWeight: 600, mb: 2, color: '#1976d2', fontSize: 18 }}>Disclaimer</Typography>
+              
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                The Aramco Reviews App is designed to collect customer feedback for service improvement purposes only. All reviews submitted through this platform are recorded to help enhance customer experience at Aramco fuel stations.
+              </Typography>
+
+              <Typography variant="body2" sx={{ mb: 2 }}>
                 <strong>Rewards against completion and submission of reviews must be claimed on Aramco's A-Stops only on specific nominated products</strong>
               </Typography>
-              <Typography variant="body2" sx={{ color: '#666' }}>
-                Rewards, offers, or complimentary items are subject to availability, station participation, and internal policies. Submission of a review does not guarantee fulfillment of any reward or claim.
+
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                Rewards, offers, or complimentary items (if applicable) are subject to availability, station participation, and internal policies. Submission of a review does not guarantee fulfillment of any reward or claim.
+              </Typography>
+
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                Aramco Pakistan reserves the right to verify, approve, modify, or decline any review, reward, or claim in case of misuse, duplication, technical issues, or violation of platform guidelines.
+              </Typography>
+
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                For any queries, concerns, or unfulfilled claims, please contact us at <strong>aramcostations@gno.com.pk</strong>
+              </Typography>
+
+              <Typography variant="body2">
+                By using this application, you acknowledge and agree to this disclaimer.
               </Typography>
             </Box>
             {state.error && <Alert severity="error" sx={{ mt: 2 }}>{state.error}</Alert>}
