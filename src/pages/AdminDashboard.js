@@ -1,10 +1,31 @@
 
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import normalizeStations from '../utils/stationUtils';
-import { useNavigate } from 'react-router-dom';
-import { Box, Typography, Grid, Card, CardContent, Container, Divider, Chip, Avatar, Paper, TextField, MenuItem, CircularProgress, IconButton, Button } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  Container,
+  Divider,
+  Chip,
+  Avatar,
+  Paper,
+  TextField,
+  CircularProgress,
+  IconButton,
+  Button,
+  Tooltip,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import ClearIcon from '@mui/icons-material/Clear';
 import BarChartIcon from '@mui/icons-material/BarChart';
@@ -20,6 +41,7 @@ function AdminDashboard() {
   const [stationFilter, setStationFilter] = useState('all');
   const [stationOptions, setStationOptions] = useState([]);
   const [stationLoading, setStationLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Redirect to admin login if not marked as admin locally
@@ -34,119 +56,349 @@ function AdminDashboard() {
         setStats(statsRes.data);
         setStationOptions(normalizeStations(stationsRes.data));
         setStationLoading(false);
+        setLoading(false);
       })
       .catch(() => {
         setError('Failed to load stats or stations');
         setStationLoading(false);
+        setLoading(false);
       });
   }, []);
 
-  if (error) return <Box sx={{ mt: 8, textAlign: 'center' }}><Typography color="error">{error}</Typography></Box>;
-  if (!stats) return <Box sx={{ mt: 8, textAlign: 'center' }}><Typography>Loading dashboard...</Typography></Box>;
+  if (loading && !stats) {
+    return (
+      <Box
+        sx={{
+          minHeight: '60vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexDirection: 'column',
+          gap: 2,
+        }}
+      >
+        <CircularProgress size={40} />
+        <Typography variant="body1" color="text.secondary">
+          Loading admin insights...
+        </Typography>
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ mt: 8, textAlign: 'center' }}>
+        <Typography color="error" sx={{ fontWeight: 600, mb: 1 }}>
+          {error}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Please refresh the page to try again.
+        </Typography>
+      </Box>
+    );
+  }
+
+  if (!stats) return null;
 
   return (
-    <Box sx={{ bgcolor: 'linear-gradient(135deg, #e0e7ff 0%, #f5f6fa 100%)', minHeight: '100vh', py: 6 }}>
-      <Container maxWidth="md">
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 4 }}>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        py: 6,
+        background: 'radial-gradient(circle at top left, #e3f2fd 0, #f5f6fa 45%, #ffffff 100%)',
+      }}
+    >
+      <Container maxWidth="lg">
+        {/* Header */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            mb: 4,
+            gap: 3,
+          }}
+        >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             <Box
               component="img"
               src={logo}
               alt="Aramco Logo"
-              sx={{ display: 'block', height: 40, width: 'auto' }}
+              sx={{ display: 'block', height: 44, width: 'auto', borderRadius: 1 }}
             />
-            <Typography variant="h4" sx={{ fontWeight: 800, color: '#1976d2' }}>
-              <BarChartIcon sx={{ fontSize: 36, mb: -1, mr: 1 }} /> Admin Dashboard
-            </Typography>
+            <Box>
+              <Typography
+                variant="h4"
+                sx={{ fontWeight: 800, color: '#0d47a1', letterSpacing: 0.5 }}
+              >
+                <BarChartIcon sx={{ fontSize: 32, mb: -0.5, mr: 1 }} />
+                Admin Insights
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Monitor station performance, customer sentiment, and coupon activity at a glance.
+              </Typography>
+            </Box>
           </Box>
-          <Button color="error" variant="outlined" onClick={() => { localStorage.removeItem('isAdmin'); localStorage.removeItem('token'); window.location.href = '/admin-login'; }}>Logout</Button>
+          <Button
+            color="error"
+            variant="outlined"
+            onClick={() => {
+              localStorage.removeItem('isAdmin');
+              localStorage.removeItem('token');
+              window.location.href = '/admin-login';
+            }}
+            sx={{
+              borderRadius: 999,
+              px: 3,
+            }}
+          >
+            Logout
+          </Button>
         </Box>
+
+        {/* High level metrics */}
         <Grid container spacing={3} sx={{ mb: 4 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ p: 2, textAlign: 'center', boxShadow: 4 }}>
+            <Card
+              sx={{
+                p: 2,
+                textAlign: 'center',
+                boxShadow: 3,
+                borderRadius: 3,
+                background: 'linear-gradient(145deg, #e3f2fd, #ffffff)',
+              }}
+            >
               <CardContent>
-                <Typography variant="h6" color="text.secondary">Total Reviews</Typography>
-                <Typography variant="h4" sx={{ fontWeight: 700, color: '#1976d2' }}>{stats.totalReviews}</Typography>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Total Reviews
+                </Typography>
+                <Typography variant="h4" sx={{ fontWeight: 700, color: '#1976d2' }}>
+                  {stats.totalReviews}
+                </Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ p: 2, textAlign: 'center', boxShadow: 4 }}>
+            <Card
+              sx={{
+                p: 2,
+                textAlign: 'center',
+                boxShadow: 3,
+                borderRadius: 3,
+                background: 'linear-gradient(145deg, #e8f5e9, #ffffff)',
+              }}
+            >
               <CardContent>
-                <Typography variant="h6" color="text.secondary">Total Stations</Typography>
-                <Typography variant="h4" sx={{ fontWeight: 700, color: '#1976d2' }}>{stats.totalStations}</Typography>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Total Stations
+                </Typography>
+                <Typography variant="h4" sx={{ fontWeight: 700, color: '#1976d2' }}>
+                  {stats.totalStations}
+                </Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ p: 2, textAlign: 'center', boxShadow: 4 }}>
+            <Card
+              sx={{
+                p: 2,
+                textAlign: 'center',
+                boxShadow: 3,
+                borderRadius: 3,
+                background: 'linear-gradient(145deg, #fff3e0, #ffffff)',
+              }}
+            >
               <CardContent>
-                <Typography variant="h6" color="text.secondary">Total Coupons</Typography>
-                <Typography variant="h4" sx={{ fontWeight: 700, color: '#1976d2' }}>{stats.totalCoupons}</Typography>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Total Coupons
+                </Typography>
+                <Typography variant="h4" sx={{ fontWeight: 700, color: '#1976d2' }}>
+                  {stats.totalCoupons}
+                </Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ p: 2, textAlign: 'center', boxShadow: 4 }}>
+            <Card
+              sx={{
+                p: 2,
+                textAlign: 'center',
+                boxShadow: 3,
+                borderRadius: 3,
+                background: 'linear-gradient(145deg, #fffde7, #ffffff)',
+              }}
+            >
               <CardContent>
-                <Typography variant="h6" color="text.secondary">Avg. Rating</Typography>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Avg. Rating
+                </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 1 }}>
                   <StarIcon sx={{ color: '#ffb300', mr: 0.5 }} />
-                  <Typography variant="h4" sx={{ fontWeight: 700, color: '#1976d2' }}>{(stats.avgRating ?? 0).toFixed(2)}</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 700, color: '#1976d2' }}>
+                    {(stats.avgRating ?? 0).toFixed(2)}
+                  </Typography>
                 </Box>
               </CardContent>
             </Card>
           </Grid>
         </Grid>
-        <Paper sx={{ p: 3, mb: 4, borderRadius: 3, boxShadow: 2 }}>
-          <Typography variant="h5" sx={{ fontWeight: 700, color: '#1976d2', mb: 2 }}>
-            <EmojiEventsIcon sx={{ mb: -0.5, mr: 1, color: '#ffd600' }} /> Top Stations
-          </Typography>
-          <Divider sx={{ mb: 2 }} />
-          <Grid container spacing={2}>
-            {(stats.topStations || []).map(s => (
-              <Grid item xs={12} sm={6} key={s._id}>
-                <Card sx={{ p: 2, borderLeft: '6px solid #1976d2', borderRadius: 2, boxShadow: 2 }}>
-                  <CardContent>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                      <Avatar sx={{ bgcolor: '#1976d2', mr: 1 }}><LocalGasStationIcon /></Avatar>
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>{s.name}</Typography>
-                    </Box>
-                    <Chip label={`Avg: ${s.avgRating?.toFixed(2) || 0}`} color="primary" sx={{ mr: 1 }} />
-                    <Chip label={`Reviews: ${s.reviewCount}`} color="secondary" />
-                  </CardContent>
-                </Card>
+
+        {/* Station performance */}
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 3, borderRadius: 3, boxShadow: 2, height: '100%' }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: '#1976d2', mb: 2 }}>
+                <EmojiEventsIcon sx={{ mb: -0.5, mr: 1, color: '#ffd600' }} /> Top Stations
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              <Grid container spacing={2}>
+                {(stats.topStations || []).map((s, idx) => (
+                  <Grid item xs={12} key={s._id}>
+                    <Card
+                      sx={{
+                        p: 2,
+                        borderLeft: '6px solid #1976d2',
+                        borderRadius: 2,
+                        boxShadow: 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <CardContent
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          width: '100%',
+                          py: 1,
+                        }}
+                      >
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                          <Avatar sx={{ bgcolor: '#1976d2' }}>
+                            <LocalGasStationIcon />
+                          </Avatar>
+                          <Box>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                              {s.name}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              Rank #{idx + 1}
+                            </Typography>
+                          </Box>
+                        </Box>
+                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                          <Chip
+                            label={`Avg: ${s.avgRating?.toFixed(2) || 0}`}
+                            color="primary"
+                            size="small"
+                          />
+                          <Chip
+                            label={`Reviews: ${s.reviewCount}`}
+                            color="secondary"
+                            size="small"
+                          />
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+                {(!stats.topStations || stats.topStations.length === 0) && (
+                  <Grid item xs={12}>
+                    <Typography variant="body2" color="text.secondary">
+                      No data yet.
+                    </Typography>
+                  </Grid>
+                )}
               </Grid>
-            ))}
+            </Paper>
           </Grid>
-        </Paper>
-        <Paper sx={{ p: 3, borderRadius: 3, boxShadow: 2 }}>
-          <Typography variant="h5" sx={{ fontWeight: 700, color: '#d32f2f', mb: 2 }}>
-            <EmojiEventsIcon sx={{ mb: -0.5, mr: 1, color: '#d32f2f' }} /> Lowest Stations
-          </Typography>
-          <Divider sx={{ mb: 2 }} />
-          <Grid container spacing={2}>
-            {(stats.lowStations || []).map(s => (
-              <Grid item xs={12} sm={6} key={s._id}>
-                <Card sx={{ p: 2, borderLeft: '6px solid #d32f2f', borderRadius: 2, boxShadow: 2 }}>
-                  <CardContent>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                      <Avatar sx={{ bgcolor: '#d32f2f', mr: 1 }}><LocalGasStationIcon /></Avatar>
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>{s.name}</Typography>
-                    </Box>
-                    <Chip label={`Avg: ${s.avgRating?.toFixed(2) || 0}`} color="primary" sx={{ mr: 1 }} />
-                    <Chip label={`Reviews: ${s.reviewCount}`} color="secondary" />
-                  </CardContent>
-                </Card>
+
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 3, borderRadius: 3, boxShadow: 2, height: '100%' }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: '#d32f2f', mb: 2 }}>
+                <EmojiEventsIcon sx={{ mb: -0.5, mr: 1, color: '#d32f2f' }} /> Lowest Stations
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              <Grid container spacing={2}>
+                {(stats.lowStations || []).map((s, idx) => (
+                  <Grid item xs={12} key={s._id}>
+                    <Card
+                      sx={{
+                        p: 2,
+                        borderLeft: '6px solid #d32f2f',
+                        borderRadius: 2,
+                        boxShadow: 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <CardContent
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          width: '100%',
+                          py: 1,
+                        }}
+                      >
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                          <Avatar sx={{ bgcolor: '#d32f2f' }}>
+                            <LocalGasStationIcon />
+                          </Avatar>
+                          <Box>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                              {s.name}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              Needs attention
+                            </Typography>
+                          </Box>
+                        </Box>
+                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                          <Chip
+                            label={`Avg: ${s.avgRating?.toFixed(2) || 0}`}
+                            color="primary"
+                            size="small"
+                          />
+                          <Chip
+                            label={`Reviews: ${s.reviewCount}`}
+                            color="secondary"
+                            size="small"
+                          />
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+                {(!stats.lowStations || stats.lowStations.length === 0) && (
+                  <Grid item xs={12}>
+                    <Typography variant="body2" color="text.secondary">
+                      No data yet.
+                    </Typography>
+                  </Grid>
+                )}
               </Grid>
-            ))}
+            </Paper>
           </Grid>
-        </Paper>
+        </Grid>
+
         {/* Station Reviews Section */}
-        <Paper sx={{ p: 3, mt: 4, borderRadius: 3, boxShadow: 2 }}>
-          <Typography variant="h5" sx={{ fontWeight: 700, color: '#1976d2', mb: 2 }}>
-            Reviews by Station
-          </Typography>
+        <Paper sx={{ p: 3, mt: 2, borderRadius: 3, boxShadow: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, gap: 2 }}>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: '#1976d2' }}>
+                Reviews by Station
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Dive into detailed feedback per station and filter quickly.
+              </Typography>
+            </Box>
+            <Tooltip title="Filter and inspect reviews for specific stations">
+              <Chip label="Review Analytics" color="primary" variant="outlined" />
+            </Tooltip>
+          </Box>
           <Divider sx={{ mb: 2 }} />
           <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2, minWidth: 320 }}>
             <Autocomplete
@@ -182,36 +434,38 @@ function AdminDashboard() {
               const station = stationOptions.find(s => s._id === stationId) || {};
               return (
                 <Box key={stationId} sx={{ mb: 4 }}>
-                  <Typography variant="h6" sx={{ color: '#1976d2', mb: 1 }}>{station.name || stationId}</Typography>
+                  <Typography variant="subtitle1" sx={{ color: '#1976d2', mb: 1, fontWeight: 600 }}>
+                    {station.name || stationId}
+                  </Typography>
                   {(!reviews || reviews.length === 0) ? (
                     <Typography color="text.secondary">No reviews yet.</Typography>
                   ) : (
-                    <Box sx={{ overflowX: 'auto' }}>
-                      <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 8 }}>
-                        <thead>
-                          <tr style={{ background: '#f0f4ff' }}>
-                            <th style={{ padding: 6, border: '1px solid #e0e0e0' }}>User</th>
-                            <th style={{ padding: 6, border: '1px solid #e0e0e0' }}>Name</th>
-                            <th style={{ padding: 6, border: '1px solid #e0e0e0' }}>Contact</th>
-                            <th style={{ padding: 6, border: '1px solid #e0e0e0' }}>Rating</th>
-                            <th style={{ padding: 6, border: '1px solid #e0e0e0' }}>Comment</th>
-                            <th style={{ padding: 6, border: '1px solid #e0e0e0' }}>Date</th>
-                          </tr>
-                        </thead>
-                        <tbody>
+                    <TableContainer sx={{ borderRadius: 2, border: '1px solid #e0e0e0' }}>
+                      <Table size="small">
+                        <TableHead>
+                          <TableRow sx={{ backgroundColor: '#f0f4ff' }}>
+                            <TableCell>User</TableCell>
+                            <TableCell>Name</TableCell>
+                            <TableCell>Contact</TableCell>
+                            <TableCell>Rating</TableCell>
+                            <TableCell>Comment</TableCell>
+                            <TableCell>Date</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
                           {reviews.map(r => (
-                            <tr key={r._id}>
-                              <td style={{ padding: 6, border: '1px solid #e0e0e0' }}>{r.user?.email || r.user?.phone || '-'}</td>
-                              <td style={{ padding: 6, border: '1px solid #e0e0e0' }}>{r.name || '-'}</td>
-                              <td style={{ padding: 6, border: '1px solid #e0e0e0' }}>{r.contact || '-'}</td>
-                              <td style={{ padding: 6, border: '1px solid #e0e0e0' }}>{r.rating}</td>
-                              <td style={{ padding: 6, border: '1px solid #e0e0e0' }}>{r.comment || '-'}</td>
-                              <td style={{ padding: 6, border: '1px solid #e0e0e0' }}>{new Date(r.createdAt).toLocaleString()}</td>
-                            </tr>
+                            <TableRow key={r._id} hover>
+                              <TableCell>{r.user?.email || r.user?.phone || '-'}</TableCell>
+                              <TableCell>{r.name || '-'}</TableCell>
+                              <TableCell>{r.contact || '-'}</TableCell>
+                              <TableCell>{r.rating}</TableCell>
+                              <TableCell>{r.comment || '-'}</TableCell>
+                              <TableCell>{new Date(r.createdAt).toLocaleString()}</TableCell>
+                            </TableRow>
                           ))}
-                        </tbody>
-                      </table>
-                    </Box>
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
                   )}
                 </Box>
               );
