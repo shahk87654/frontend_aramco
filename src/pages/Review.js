@@ -172,7 +172,6 @@ function Review() {
                     Submit Review
                   </Button>
                 </Grid>
-                </Grid>
               </Grid>
             </form>
             <Divider sx={{ my: 3 }} />
