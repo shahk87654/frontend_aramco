@@ -176,7 +176,7 @@ function AdminLogin() {
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       borderRadius: '8px',
-                      backgroundColor: '#f9f9f9',
+                      backgroundColor: '#ffffff',
                       border: '1px solid #e0e0e0',
                       transition: 'all 0.3s ease',
                       '&:hover fieldset': {
@@ -184,11 +184,16 @@ function AdminLogin() {
                       },
                       '&.Mui-focused fieldset': {
                         borderColor: '#E31837',
-                        backgroundColor: '#fff'
+                        borderWidth: '2px'
                       }
                     },
                     '& .MuiOutlinedInput-input': {
-                      fontSize: '0.95rem'
+                      fontSize: '0.95rem',
+                      color: '#333',
+                      '&::placeholder': {
+                        color: '#999',
+                        opacity: 1
+                      }
                     }
                   }}
                 />
@@ -227,7 +232,7 @@ function AdminLogin() {
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       borderRadius: '8px',
-                      backgroundColor: '#f9f9f9',
+                      backgroundColor: '#ffffff',
                       border: '1px solid #e0e0e0',
                       transition: 'all 0.3s ease',
                       '&:hover fieldset': {
@@ -235,11 +240,16 @@ function AdminLogin() {
                       },
                       '&.Mui-focused fieldset': {
                         borderColor: '#E31837',
-                        backgroundColor: '#fff'
+                        borderWidth: '2px'
                       }
                     },
                     '& .MuiOutlinedInput-input': {
-                      fontSize: '0.95rem'
+                      fontSize: '0.95rem',
+                      color: '#333',
+                      '&::placeholder': {
+                        color: '#999',
+                        opacity: 1
+                      }
                     }
                   }}
                 />
