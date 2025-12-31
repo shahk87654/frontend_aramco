@@ -28,19 +28,21 @@ function Review() {
   qrDialogOpen: false,
   disclaimerDialogOpen: false,
   submitting: false,
-  cooldownDialogOpen: false
+  cooldownDialogOpen: false,
+  successDialogOpen: false
   };
   function reducer(state, action) {
     switch (action.type) {
       case 'set': return { ...state, [action.field]: action.value };
       case 'error': return { ...state, error: action.value };
-      case 'success': return { ...state, success: action.value };
+      case 'success': return { ...state, success: action.value, successDialogOpen: true };
   case 'showQR': return { ...state, showQR: action.value, qrDialogOpen: true };
       case 'openDisclaimer': return { ...state, disclaimerDialogOpen: true };
       case 'closeDisclaimer': return { ...state, disclaimerDialogOpen: false };
       case 'submitting': return { ...state, submitting: action.value };
       case 'openCooldown': return { ...state, cooldownDialogOpen: true };
       case 'closeCooldown': return { ...state, cooldownDialogOpen: false };
+      case 'closeSuccess': return { ...state, successDialogOpen: false };
       case 'reset': return initialState;
       default: return state;
     }
@@ -238,15 +240,6 @@ function Review() {
               </Typography>
             </Box>
             {state.error && <Alert severity="error" sx={{ mt: 2 }}>{state.error}</Alert>}
-            {state.success && !state.showQR && (
-              <Alert severity="success" sx={{ mt: 2 }}>
-                Review submitted!<br/>
-                Visits: {state.success.visits} <br/>
-                {state.success.visitsLeft === 0
-                  ? 'You just earned a free tea!'
-                  : `Visits left for free tea: ${state.success.visitsLeft}`}
-              </Alert>
-            )}
            
             <Dialog open={!!state.qrDialogOpen} onClose={() => dispatch({ type: 'showQR', value: null })} maxWidth="xs" fullWidth>
               <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -326,6 +319,26 @@ function Review() {
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   You can submit your next review after 18 hours have passed since your last submission.
+                </Typography>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={state.successDialogOpen} onClose={() => dispatch({ type: 'closeSuccess' })} maxWidth="xs" fullWidth>
+              <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#1976d2' }}>
+                <span>✅ Review Submitted</span>
+                <IconButton onClick={() => dispatch({ type: 'closeSuccess' })} size="small"><CloseIcon /></IconButton>
+              </DialogTitle>
+              <DialogContent sx={{ textAlign: 'center', py: 3 }}>
+                <Typography variant="h6" sx={{ mb: 2, color: '#1976d2', fontWeight: 600 }}>
+                  Review submitted!
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 2 }}>
+                  Visits: <strong>{state.success?.visits}</strong>
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {state.success?.visitsLeft === 0
+                    ? '🎉 You just earned a free tea!'
+                    : `Visits left for free tea: ${state.success?.visitsLeft}`}
                 </Typography>
               </DialogContent>
             </Dialog>
