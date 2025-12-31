@@ -105,15 +105,15 @@ function Review() {
         setTimeout(() => {
           dispatch({ type: 'showQR', value: { code: res.data.coupon.code, name: state.name, contact: state.contact } });
         }, 2500);
-     Handle 18h review cooldown error with popup
-  let msg = err.response?.data?.msg || 'Failed to submit review';
-  if (msg.includes('once per 18h') || msg.includes('18 hours')) {
-    dispatch({ type: 'openCooldown' });
-  } else {
-    dispatch({ type: 'error', value: msg });
-  }iled to submit review';
-  if (msg.includes('once per 24h')) msg = 'Failed to submit review';
-  dispatch({ type: 'error', value: msg });
+      }
+    } catch (err) {
+      // Handle 18h review cooldown error with popup
+      let msg = err.response?.data?.msg || 'Failed to submit review';
+      if (msg.includes('once per 18h') || msg.includes('18 hours')) {
+        dispatch({ type: 'openCooldown' });
+      } else {
+        dispatch({ type: 'error', value: msg });
+      }
     } finally {
       // Reset submitting state
       dispatch({ type: 'submitting', value: false });
