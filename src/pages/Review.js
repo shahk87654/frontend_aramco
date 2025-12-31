@@ -26,7 +26,8 @@ function Review() {
     success: null,
   showQR: null,
   qrDialogOpen: false,
-  disclaimerDialogOpen: false
+  disclaimerDialogOpen: false,
+  submitting: false
   };
   function reducer(state, action) {
     switch (action.type) {
@@ -36,6 +37,7 @@ function Review() {
   case 'showQR': return { ...state, showQR: action.value, qrDialogOpen: true };
       case 'openDisclaimer': return { ...state, disclaimerDialogOpen: true };
       case 'closeDisclaimer': return { ...state, disclaimerDialogOpen: false };
+      case 'submitting': return { ...state, submitting: action.value };
       case 'reset': return initialState;
       default: return state;
     }
@@ -57,10 +59,18 @@ function Review() {
 
   const handleSubmit = async e => {
     e.preventDefault();
+    
+    // Prevent multiple submissions
+    if (state.submitting) return;
+    
     dispatch({ type: 'error', value: '' });
     if (!state.rating) return dispatch({ type: 'error', value: 'Please provide an overall rating' });
     if (!state.name.trim()) return dispatch({ type: 'error', value: 'Please enter your name' });
   if (!state.contact.trim()) return dispatch({ type: 'error', value: 'Please enter your phone number' });
+    
+    // Set submitting state
+    dispatch({ type: 'submitting', value: true });
+    
     try {
       const gps = await new Promise((resolve) => {
         if (navigator.geolocation) {
@@ -98,6 +108,9 @@ function Review() {
   let msg = err.response?.data?.msg || 'Failed to submit review';
   if (msg.includes('once per 24h')) msg = 'Failed to submit review';
   dispatch({ type: 'error', value: msg });
+    } finally {
+      // Reset submitting state
+      dispatch({ type: 'submitting', value: false });
     }
   };
 
@@ -177,8 +190,15 @@ function Review() {
                 </Grid>
                 {/* TODO: Add reCAPTCHA widget here */}
                 <Grid item xs={12}>
-                  <Button type="submit" variant="contained" color="primary" fullWidth sx={{ fontWeight: 700, borderRadius: 2, py: 1.2, mt: 1 }}>
-                    Submit Review
+                  <Button 
+                    type="submit" 
+                    variant="contained" 
+                    color="primary" 
+                    fullWidth 
+                    disabled={state.submitting}
+                    sx={{ fontWeight: 700, borderRadius: 2, py: 1.2, mt: 1 }}
+                  >
+                    {state.submitting ? 'Submitting...' : 'Submit Review'}
                   </Button>
                 </Grid>
               </Grid>
