@@ -84,7 +84,7 @@ function RewardSearch() {
                             <Typography color="error" sx={{ mt: 1 }}>Already claimed</Typography>
                           ) : (
                             <>
-                              <Typography color="primary" sx={{ mt: 1 }}>Valid for free tea or coffee</Typography>
+                              <Typography color="primary" sx={{ mt: 1 }}>Valid for free tea</Typography>
                               <Button
                                 variant="contained"
                                 color="success"
@@ -103,7 +103,7 @@ function RewardSearch() {
                 </Grid>
                 {visits > 0 && visits % 5 === 0 && (rewards || []).some(c => !c.used) && (
                   <Typography variant="h6" color="success.main" sx={{ mt: 2 }}>
-                    Eligible for free tea or coffee! Show your QR code and coupon to claim.
+                    Eligible for free tea! Show your QR code and coupon to claim.
                   </Typography>
                 )}
               </Box>

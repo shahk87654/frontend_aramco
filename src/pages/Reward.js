@@ -34,7 +34,7 @@ function Reward() {
               Congratulations!
             </Typography>
             <Typography variant="h6" sx={{ mb: 2 }}>
-              You’ve earned a free tea or coffee!
+              You've earned a free tea!
             </Typography>
             <Typography variant="body1" sx={{ mb: 1 }}>
               Show this code to the station staff to redeem your reward:

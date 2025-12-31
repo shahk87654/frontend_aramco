@@ -27,7 +27,8 @@ function Review() {
   showQR: null,
   qrDialogOpen: false,
   disclaimerDialogOpen: false,
-  submitting: false
+  submitting: false,
+  cooldownDialogOpen: false
   };
   function reducer(state, action) {
     switch (action.type) {
@@ -38,6 +39,8 @@ function Review() {
       case 'openDisclaimer': return { ...state, disclaimerDialogOpen: true };
       case 'closeDisclaimer': return { ...state, disclaimerDialogOpen: false };
       case 'submitting': return { ...state, submitting: action.value };
+      case 'openCooldown': return { ...state, cooldownDialogOpen: true };
+      case 'closeCooldown': return { ...state, cooldownDialogOpen: false };
       case 'reset': return initialState;
       default: return state;
     }
@@ -102,10 +105,13 @@ function Review() {
         setTimeout(() => {
           dispatch({ type: 'showQR', value: { code: res.data.coupon.code, name: state.name, contact: state.contact } });
         }, 2500);
-      }
-    } catch (err) {
-  // Remove 24h review restriction error message
+     Handle 18h review cooldown error with popup
   let msg = err.response?.data?.msg || 'Failed to submit review';
+  if (msg.includes('once per 18h') || msg.includes('18 hours')) {
+    dispatch({ type: 'openCooldown' });
+  } else {
+    dispatch({ type: 'error', value: msg });
+  }iled to submit review';
   if (msg.includes('once per 24h')) msg = 'Failed to submit review';
   dispatch({ type: 'error', value: msg });
     } finally {
@@ -237,8 +243,8 @@ function Review() {
                 Review submitted!<br/>
                 Visits: {state.success.visits} <br/>
                 {state.success.visitsLeft === 0
-                  ? 'You just earned a free coffee!'
-                  : `Visits left for free coffee: ${state.success.visitsLeft}`}
+                  ? 'You just earned a free tea!'
+                  : `Visits left for free tea: ${state.success.visitsLeft}`}
               </Alert>
             )}
            
@@ -305,6 +311,21 @@ function Review() {
                 </Typography>
                 <Typography variant="body2">
                   By using this application, you acknowledge and agree to this disclaimer.
+                </Typography>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={state.cooldownDialogOpen} onClose={() => dispatch({ type: 'closeCooldown' })} maxWidth="xs" fullWidth>
+              <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#d32f2f' }}>
+                <span>⏱️ Please Wait</span>
+                <IconButton onClick={() => dispatch({ type: 'closeCooldown' })} size="small"><CloseIcon /></IconButton>
+              </DialogTitle>
+              <DialogContent sx={{ textAlign: 'center', py: 3 }}>
+                <Typography variant="h6" sx={{ mb: 2, color: '#d32f2f', fontWeight: 600 }}>
+                  Please wait 18 hours before submitting another review
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  You can submit your next review after 18 hours have passed since your last submission.
                 </Typography>
               </DialogContent>
             </Dialog>
