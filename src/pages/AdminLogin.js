@@ -9,8 +9,7 @@ import {
   Button, 
   Alert, 
   Container,
-  InputAdornment,
-  Divider
+  InputAdornment
 } from '@mui/material';
 import { Lock, PersonOutline } from '@mui/icons-material';
 import logo from '../assets/retail-logo.jpg';
@@ -46,7 +45,7 @@ function AdminLogin() {
       localStorage.setItem('adminLoginAt', String(Date.now()));
       navigate('/admin/dashboard');
     } else {
-      setError('Invalid username or password. Please try again.');
+      setError('Invalid username or password');
       setLoading(false);
     }
   };
@@ -54,89 +53,96 @@ function AdminLogin() {
   return (
     <Box 
       sx={{ 
-        minHeight: '100vh', 
+        minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #1976d2 0%, #0d47a1 50%, #1565c0 100%)',
+        background: 'linear-gradient(135deg, #f0f2f5 0%, #e8eaef 100%)',
         position: 'relative',
-        overflow: 'hidden',
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          width: '400px',
-          height: '400px',
-          background: 'rgba(255, 255, 255, 0.1)',
-          borderRadius: '50%',
-          top: '-50px',
-          right: '-50px'
-        },
-        '&::after': {
-          content: '""',
-          position: 'absolute',
-          width: '300px',
-          height: '300px',
-          background: 'rgba(255, 255, 255, 0.05)',
-          borderRadius: '50%',
-          bottom: '-100px',
-          left: '-100px'
-        }
+        padding: '20px'
       }}
     >
-      <Container maxWidth="sm">
+      {/* Decorative Aramco Red Accent - Top Right */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          width: '400px',
+          height: '400px',
+          background: 'linear-gradient(135deg, rgba(227, 24, 55, 0.08) 0%, transparent 100%)',
+          borderRadius: '0 0 0 400px',
+          pointerEvents: 'none'
+        }}
+      />
+
+      {/* Decorative Dark Accent - Bottom Left */}
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          width: '300px',
+          height: '300px',
+          background: 'linear-gradient(135deg, rgba(0, 61, 122, 0.05) 0%, transparent 100%)',
+          borderRadius: '0 300px 0 0',
+          pointerEvents: 'none'
+        }}
+      />
+
+      <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
         <Card 
           sx={{ 
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
-            borderRadius: 4,
-            overflow: 'hidden',
-            position: 'relative',
-            zIndex: 1
+            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.08)',
+            borderRadius: '12px',
+            overflow: 'hidden'
           }}
         >
-          {/* Header Section with Gradient */}
+          {/* Top Red Accent Bar */}
           <Box
             sx={{
-              background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
-              padding: '40px 20px',
-              textAlign: 'center',
-              color: 'white'
+              height: '5px',
+              background: 'linear-gradient(90deg, #E31837 0%, #FF6B35 100%)'
             }}
-          >
-            <Box
-              component="img"
-              src={logo}
-              alt="Aramco Logo"
-              sx={{ 
-                maxWidth: '120px',
-                height: 'auto',
-                mb: 2,
-                filter: 'brightness(0) invert(1)',
-                display: 'block',
-                mx: 'auto'
-              }}
-            />
-            <Typography 
-              variant="h4" 
-              sx={{ 
-                fontWeight: 800,
-                mb: 0.5,
-                letterSpacing: '0.5px'
-              }}
-            >
-              Admin Portal
-            </Typography>
-            <Typography 
-              variant="body2" 
-              sx={{ 
-                opacity: 0.9,
-                letterSpacing: '0.3px'
-              }}
-            >
-              Secure Access Required
-            </Typography>
-          </Box>
+          />
 
-          <CardContent sx={{ pt: 4, pb: 4, px: 4 }}>
+          <CardContent sx={{ pt: 5, pb: 4, px: 4 }}>
+            {/* Logo Section */}
+            <Box sx={{ textAlign: 'center', mb: 3 }}>
+              <Box
+                component="img"
+                src={logo}
+                alt="Aramco Logo"
+                sx={{ 
+                  maxWidth: '100px',
+                  height: 'auto',
+                  mb: 2.5,
+                  display: 'block',
+                  mx: 'auto'
+                }}
+              />
+              <Typography 
+                variant="h5" 
+                sx={{ 
+                  fontWeight: 700,
+                  color: '#003D7A',
+                  letterSpacing: '0.5px',
+                  mb: 0.5
+                }}
+              >
+                Admin Portal
+              </Typography>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  color: '#666',
+                  fontWeight: 500
+                }}
+              >
+                Secure Access
+              </Typography>
+            </Box>
+
             <form onSubmit={handleSubmit}>
               {/* Username Field */}
               <Box sx={{ mb: 2.5 }}>
@@ -144,8 +150,11 @@ function AdminLogin() {
                   variant="body2" 
                   sx={{ 
                     fontWeight: 600, 
-                    color: '#333',
-                    mb: 1
+                    color: '#003D7A',
+                    mb: 0.8,
+                    textTransform: 'uppercase',
+                    fontSize: '0.75rem',
+                    letterSpacing: '0.5px'
                   }}
                 >
                   Username
@@ -154,26 +163,32 @@ function AdminLogin() {
                   value={username} 
                   onChange={e => setUsername(e.target.value)}
                   fullWidth
-                  placeholder="Enter your username or email"
+                  placeholder="Enter username or email"
                   disabled={loading}
+                  required
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <PersonOutline sx={{ color: '#1976d2', mr: 1 }} />
+                        <PersonOutline sx={{ color: '#E31837', mr: 1, fontSize: '20px' }} />
                       </InputAdornment>
                     ),
                   }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      backgroundColor: '#f5f5f5',
+                      borderRadius: '8px',
+                      backgroundColor: '#f9f9f9',
+                      border: '1px solid #e0e0e0',
+                      transition: 'all 0.3s ease',
                       '&:hover fieldset': {
-                        borderColor: '#1976d2'
+                        borderColor: '#E31837'
                       },
                       '&.Mui-focused fieldset': {
-                        borderColor: '#1976d2',
+                        borderColor: '#E31837',
                         backgroundColor: '#fff'
                       }
+                    },
+                    '& .MuiOutlinedInput-input': {
+                      fontSize: '0.95rem'
                     }
                   }}
                 />
@@ -185,8 +200,11 @@ function AdminLogin() {
                   variant="body2" 
                   sx={{ 
                     fontWeight: 600, 
-                    color: '#333',
-                    mb: 1
+                    color: '#003D7A',
+                    mb: 0.8,
+                    textTransform: 'uppercase',
+                    fontSize: '0.75rem',
+                    letterSpacing: '0.5px'
                   }}
                 >
                   Password
@@ -196,26 +214,32 @@ function AdminLogin() {
                   value={password} 
                   onChange={e => setPassword(e.target.value)}
                   fullWidth
-                  placeholder="Enter your password"
+                  placeholder="Enter password"
                   disabled={loading}
+                  required
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Lock sx={{ color: '#1976d2', mr: 1 }} />
+                        <Lock sx={{ color: '#E31837', mr: 1, fontSize: '20px' }} />
                       </InputAdornment>
                     ),
                   }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      backgroundColor: '#f5f5f5',
+                      borderRadius: '8px',
+                      backgroundColor: '#f9f9f9',
+                      border: '1px solid #e0e0e0',
+                      transition: 'all 0.3s ease',
                       '&:hover fieldset': {
-                        borderColor: '#1976d2'
+                        borderColor: '#E31837'
                       },
                       '&.Mui-focused fieldset': {
-                        borderColor: '#1976d2',
+                        borderColor: '#E31837',
                         backgroundColor: '#fff'
                       }
+                    },
+                    '& .MuiOutlinedInput-input': {
+                      fontSize: '0.95rem'
                     }
                   }}
                 />
@@ -226,12 +250,13 @@ function AdminLogin() {
                 <Alert 
                   severity="error" 
                   sx={{ 
-                    mb: 3,
-                    borderRadius: 2,
-                    backgroundColor: '#ffebee',
-                    color: '#c62828',
+                    mb: 2.5,
+                    borderRadius: '8px',
+                    backgroundColor: '#fff3e0',
+                    color: '#E31837',
+                    border: '1px solid #ffccb3',
                     '& .MuiAlert-icon': {
-                      color: '#c62828'
+                      color: '#E31837'
                     }
                   }}
                 >
@@ -246,20 +271,22 @@ function AdminLogin() {
                 fullWidth
                 disabled={loading || !username || !password}
                 sx={{ 
-                  background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
+                  background: 'linear-gradient(90deg, #E31837 0%, #FF6B35 100%)',
                   fontWeight: 700,
-                  py: 1.5,
-                  borderRadius: 2,
-                  fontSize: '1rem',
+                  py: 1.3,
+                  borderRadius: '8px',
+                  fontSize: '0.95rem',
                   textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
+                  letterSpacing: '0.8px',
                   transition: 'all 0.3s ease',
+                  boxShadow: '0 4px 15px rgba(227, 24, 55, 0.25)',
                   '&:hover:not(:disabled)': {
-                    boxShadow: '0 8px 24px rgba(25, 118, 210, 0.4)',
+                    boxShadow: '0 8px 25px rgba(227, 24, 55, 0.35)',
                     transform: 'translateY(-2px)'
                   },
                   '&:disabled': {
-                    opacity: 0.6
+                    opacity: 0.6,
+                    boxShadow: 'none'
                   }
                 }}
               >
@@ -267,23 +294,38 @@ function AdminLogin() {
               </Button>
             </form>
 
-            {/* Divider */}
-            <Divider sx={{ my: 3, color: '#ddd' }} />
+            {/* Bottom Red Accent Bar */}
+            <Box
+              sx={{
+                height: '3px',
+                background: 'linear-gradient(90deg, #E31837 0%, #FF6B35 100%)',
+                mt: 4,
+                mb: -4,
+                mx: -4
+              }}
+            />
+          </CardContent>
 
-            {/* Footer Info */}
+          {/* Footer */}
+          <Box
+            sx={{
+              backgroundColor: '#f9f9f9',
+              padding: '16px 24px',
+              borderTop: '1px solid #e0e0e0'
+            }}
+          >
             <Typography 
               variant="caption" 
               sx={{ 
                 display: 'block',
                 textAlign: 'center',
                 color: '#999',
-                lineHeight: 1.6
+                fontSize: '0.8rem'
               }}
             >
-              For support, contact<br />
-              <strong>aramcostations@gno.com.pk</strong>
+              For support: <strong>aramcostations@gno.com.pk</strong>
             </Typography>
-          </CardContent>
+          </Box>
         </Card>
       </Container>
     </Box>
